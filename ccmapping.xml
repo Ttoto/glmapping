@@ -1,0 +1,17 @@
+<library path="lib/libccmapping">
+
+        <class name="ccmapping/LocalMapNodeletClass" type="ccmapping_ns::LocalMapNodeletClass"
+		base_class_type="nodelet::Nodelet">
+		<description>
+                        LocalMapNodeletClass.
+		</description>
+	</class>
+
+        <class name="ccmapping/GlobalMapNodeletClass" type="ccmapping_ns::GlobalMapNodeletClass"
+		base_class_type="nodelet::Nodelet">
+		<description>
+                        GlobalMapNodeletClass.
+		</description>
+	</class>
+
+</library>
