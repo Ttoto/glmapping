@@ -3,14 +3,14 @@
         <class name="ccmapping/LocalMapNodeletClass" type="ccmapping_ns::LocalMapNodeletClass"
 		base_class_type="nodelet::Nodelet">
 		<description>
-                        LocalMapNodeletClass.
+                        LocalMapNodeletClass
 		</description>
 	</class>
 
         <class name="ccmapping/GlobalMapNodeletClass" type="ccmapping_ns::GlobalMapNodeletClass"
 		base_class_type="nodelet::Nodelet">
 		<description>
-                        GlobalMapNodeletClass.
+                        GlobalMapNodeletClass
 		</description>
 	</class>
 

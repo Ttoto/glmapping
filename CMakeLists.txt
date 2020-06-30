@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ccmapping)
 
-set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS} -O3 -Wall -pthread") # -Wextra -Werror
+set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS} -O3 -Wall -pthread") # -Wextra -Werror
 set(CMAKE_BUILD_TYPE "RELEASE")
 
 find_package (Eigen3 REQUIRED)
@@ -47,12 +47,16 @@ include_directories(SYSTEM
     ${YAML_CPP_INCLUDE_DIR}
     ${PCL_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}/src/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/"
     )
 
 ## Declare a C++ library
 add_library(ccmapping
-    src/globalmap.cpp
-    src/localmap.cpp
+    src/nodelet_globalmap.cpp
+    src/nodelet_localmap.cpp
+    src/cc_local_map.cpp
+    src/cc_agrid.cpp
+    src/cc_rviz_vis.cpp
     )
 
 add_dependencies(ccmapping

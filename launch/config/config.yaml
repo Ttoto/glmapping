@@ -1,0 +1,20 @@
+##transformation from sensor frame to body frame
+T_B_S:
+[ 1.0,  0.0,  0.0,  0.0,
+  0.0,  1.0,  0.0,  0.0,
+  0.0,  0.0,  1.0,  0.0,
+  0.0,  0.0,  0.0,  1.0]
+
+##ccmapping parameter
+#Localmap radius d_Rho*n_Rho
+#devition of orientation 360/d_Phi_deg
+#Number of grid n_Rho*(360/d_Phi)*(nz_below+nz_over)
+ccmapping_d_Rho:    0.1 
+ccmapping_d_Phi_deg: 10
+ccmapping_d_Z:      0.1
+ccmapping_n_Rho:     70
+ccmapping_n_Z_below: 20
+ccmapping_n_Z_over:  20
+
+
+use_exactsync:    false
