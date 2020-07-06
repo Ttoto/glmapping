@@ -1,9 +1,9 @@
 ##transformation from sensor frame to body frame
 T_B_S:
-[ 1.0,  0.0,  0.0,  0.0,
-  0.0,  1.0,  0.0,  0.0,
-  0.0,  0.0,  1.0,  0.0,
-  0.0,  0.0,  0.0,  1.0]
+[  0.0,   0.0,  1.0,  0.0,
+  -1.0,   0.0,  0.0,  0.0,
+   0.0,  -1.0,  0.0,  0.0,
+   0.0,   0.0,  0.0,  1.0]
 
 ##ccmapping parameter
 #Localmap radius d_Rho*n_Rho
@@ -18,3 +18,8 @@ ccmapping_n_Z_over:  20
 
 
 use_exactsync:    false
+
+publish_tf:       true
+frame_id:         "world"
+child_frame_id:   "camera_depth_optical_frame"
+

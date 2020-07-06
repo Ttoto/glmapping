@@ -7,6 +7,9 @@ class cc_local_map
 {
 private:
     int nRho_x_nPhi;
+    double z_border_min;
+    double z_border_max;
+    SE3 T_bs; //Transformation from sensor to body
 
 public:
 
@@ -23,10 +26,11 @@ public:
     size_t mapIdx(Vec3I Rho_Phi_z);
     size_t mapIdx(int Rho, int Phi, int z);
     cc_local_map();
+    void setTbs(SE3 T_bs_in);
     void init_map(double d_Rho, double d_Phi_deg, double d_Z, int n_Rho, int n_z_below, int n_z_over);
     void creat_map();
     void creat_transfer_chart();
-    void input_pc(Vec3 pc, SE3 pose);
+    void input_pc_pose(vector<Vec3> pc, SE3 T_wb);
 
 };
 

@@ -15,12 +15,13 @@ find_package(catkin REQUIRED COMPONENTS
     nodelet
     roscpp
     rostime
-    sensor_msgs
-    std_msgs
-    geometry_msgs
-    message_generation
     message_filters
+    message_generation
+    std_msgs
+    sensor_msgs
+    geometry_msgs
     tf
+    tf2
     )
 
 add_message_files(

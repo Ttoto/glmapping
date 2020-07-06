@@ -16,6 +16,11 @@ inline size_t cc_local_map::mapIdx(int Rho, int Phi, int z)
                                +Rho);
 }
 
+void cc_local_map::setTbs(SE3 T_bs_in)
+{
+    this->T_bs=T_bs_in;
+}
+
 void cc_local_map::init_map(double d_Rho, double d_Phi_deg, double d_Z, int n_Rho, int n_z_below, int n_z_over)
 {
     this->map_dRho = d_Rho;
@@ -54,3 +59,7 @@ void cc_local_map::creat_map(void)
     cout << "should be 738" << endl;
 }
 
+void cc_local_map::input_pc_pose(vector<Vec3> pc, SE3 T_wb)
+{
+
+}
