@@ -15,7 +15,7 @@ ccmapping_n_Z_over:  20
 use_exactsync:    false
 
 publish_T_wb:      true
-frame_id:          "world"
+frame_id:          "map"
 body_frame_id:     "body_frame"
 
 publish_T_bs:      true

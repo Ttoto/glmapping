@@ -30,7 +30,7 @@ public:
     void init_map(double d_Rho, double d_Phi_deg, double d_Z, int n_Rho, int n_z_below, int n_z_over);
     void creat_map();
     void creat_transfer_chart();
-    void input_pc_pose(vector<Vec3> pc, SE3 T_wb);
+    void input_pc_pose(vector<Vec3> PC_s, SE3 T_wb);
 
 };
 

@@ -59,7 +59,20 @@ void cc_local_map::creat_map(void)
     cout << "should be 738" << endl;
 }
 
-void cc_local_map::input_pc_pose(vector<Vec3> pc, SE3 T_wb)
+void cc_local_map::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
 {
+//    //Frame [w]orld, [s]ensor, [b]ody, [l]ocalmap;
+//    SE3 T_wl(SO3(Quaterniond(1,0,0,0)),T_wb.translation());
+//    SE3 T_ws = T_wb * this->T_bs;
+//    SE3 T_ls = T_wl.inverse() * T_ws;
+//    vector<Vec3> PC_l;
+//    for(auto p_s:PC_s)
+//    {
+//        PC_l.push_back(T_ls*p_s);
+//    }
+//    for(auto p_l:PC_s)
+//    {
+//        xyz2PhoPhiZ(p_l)
+//    }
 
 }

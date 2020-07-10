@@ -35,16 +35,19 @@ private:
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, geometry_msgs::PoseStamped> ApproxSyncPolicy;
     message_filters::Synchronizer<ApproxSyncPolicy> * approxSync_;
 
+
     cc_local_map* local_map;
-    //flags
-    bool publish_tf;
-    string frame_id;
-    string child_frame_id;
     bool enable_downsample;
     int  downsample_size;
+    bool   publish_T_wb;
+    bool   publish_T_bs;
+    string frame_id;
+    string body_frame_id;
+    string sensor_frame_id;
     SE3 T_bs;
     tf2_ros::TransformBroadcaster br;
-    geometry_msgs::TransformStamped transformStamped;
+    geometry_msgs::TransformStamped transformStamped_T_wb;
+    geometry_msgs::TransformStamped transformStamped_T_bs;
 
     virtual void onInit()
     {
@@ -61,21 +64,33 @@ private:
         int    n_Z_over       = getIntVariableFromYaml(configFilePath,"ccmapping_n_Z_over");
         Mat4x4  T_bs_mat      = Mat44FromYaml(configFilePath,"T_B_S");
         bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
-        publish_tf       = getBoolVariableFromYaml(configFilePath,"publish_tf");
-        frame_id       = getStringFromYaml(configFilePath,"frame_id");
-        child_frame_id = getStringFromYaml(configFilePath,"child_frame_id");
+        publish_T_wb          = getBoolVariableFromYaml(configFilePath,"publish_T_wb");
+        publish_T_bs          = getBoolVariableFromYaml(configFilePath,"publish_T_bs");
+        frame_id              = getStringFromYaml(configFilePath,"frame_id");
+        body_frame_id         = getStringFromYaml(configFilePath,"body_frame_id");
+        sensor_frame_id       = getStringFromYaml(configFilePath,"sensor_frame_id");
         T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
                    T_bs_mat.topRightCorner(3,1));
 
-        transformStamped.header.frame_id = frame_id;
-        transformStamped.child_frame_id = child_frame_id;
-        transformStamped.transform.translation.x = 0;
-        transformStamped.transform.translation.y = 0;
-        transformStamped.transform.translation.z = 0;
-        transformStamped.transform.rotation.x = 0;
-        transformStamped.transform.rotation.y = 0;
-        transformStamped.transform.rotation.z = 0;
-        transformStamped.transform.rotation.w = 1;
+        transformStamped_T_wb.header.frame_id = frame_id;
+        transformStamped_T_wb.child_frame_id  = body_frame_id;
+        transformStamped_T_wb.transform.translation.x = 0;
+        transformStamped_T_wb.transform.translation.y = 0;
+        transformStamped_T_wb.transform.translation.z = 0;
+        transformStamped_T_wb.transform.rotation.x = 0;
+        transformStamped_T_wb.transform.rotation.y = 0;
+        transformStamped_T_wb.transform.rotation.z = 0;
+        transformStamped_T_wb.transform.rotation.w = 1;
+
+        transformStamped_T_bs.header.frame_id = body_frame_id;
+        transformStamped_T_bs.child_frame_id  = sensor_frame_id;
+        transformStamped_T_bs.transform.translation.x = T_bs.translation().x();
+        transformStamped_T_bs.transform.translation.y = T_bs.translation().y();
+        transformStamped_T_bs.transform.translation.z = T_bs.translation().z();
+        transformStamped_T_bs.transform.rotation.x = T_bs.so3().unit_quaternion().x();
+        transformStamped_T_bs.transform.rotation.y = T_bs.so3().unit_quaternion().y();
+        transformStamped_T_bs.transform.rotation.z = T_bs.so3().unit_quaternion().z();
+        transformStamped_T_bs.transform.rotation.w = T_bs.so3().unit_quaternion().w();
 
         enable_downsample = true;
         downsample_size   = 1000;
@@ -99,22 +114,25 @@ private:
         {
             pc_sub.subscribe(nh,   "/ccmapping/pc", 1);
             pose_sub.subscribe(nh, "/ccmapping/pose", 1);
-            approxSync_ = new message_filters::Synchronizer<ApproxSyncPolicy>(ApproxSyncPolicy(10), pc_sub, pose_sub);
+            approxSync_ = new message_filters::Synchronizer<ApproxSyncPolicy>(ApproxSyncPolicy(100), pc_sub, pose_sub);
             approxSync_->registerCallback(boost::bind(&LocalMapNodeletClass::pc_pose_input_callback, this, _1, _2));
             cout << "ApproxSyncPolicy" << endl;
         }
-        ros::Rate rate(20.0);
+        ros::Rate rate(10.0);
         while(1)
         {
-            if(publish_tf)
+            if(publish_T_wb)
             {
-                transformStamped.header.stamp = ros::Time::now();
-                br.sendTransform(transformStamped);
+                transformStamped_T_wb.header.stamp = ros::Time::now();
+                br.sendTransform(transformStamped_T_wb);
+            }
+            if(publish_T_bs)
+            {
+                transformStamped_T_bs.header.stamp = ros::Time::now();
+                br.sendTransform(transformStamped_T_bs);
             }
             rate.sleep();
         }
-
-
     }
 
     void pc_pose_input_callback(const sensor_msgs::PointCloud2::ConstPtr & pc_Ptr,
@@ -131,20 +149,20 @@ private:
                  Vec3(pose_Ptr->pose.position.x,
                       pose_Ptr->pose.position.y,
                       pose_Ptr->pose.position.z));
-        if(publish_tf)
+        if(publish_T_wb)
         {
-            SE3 T_ws = T_wb * T_bs;
-            transformStamped.header.stamp = pose_Ptr->header.stamp;
-            transformStamped.header.frame_id = frame_id;
-            transformStamped.child_frame_id = child_frame_id;
-            transformStamped.transform.translation.x = T_ws.translation().x();
-            transformStamped.transform.translation.y = T_ws.translation().y();
-            transformStamped.transform.translation.z = T_ws.translation().z();
-            transformStamped.transform.rotation.x = T_ws.so3().unit_quaternion().x();
-            transformStamped.transform.rotation.y = T_ws.so3().unit_quaternion().y();
-            transformStamped.transform.rotation.z = T_ws.so3().unit_quaternion().z();
-            transformStamped.transform.rotation.w = T_ws.so3().unit_quaternion().w();
-            br.sendTransform(transformStamped);
+            transformStamped_T_wb.header.stamp = pose_Ptr->header.stamp;
+            transformStamped_T_wb.header.frame_id = frame_id;
+            transformStamped_T_wb.child_frame_id  = body_frame_id;
+            transformStamped_T_wb.transform.translation.x = T_wb.translation().x();
+            transformStamped_T_wb.transform.translation.y = T_wb.translation().y();
+            transformStamped_T_wb.transform.translation.z = T_wb.translation().z();
+            transformStamped_T_wb.transform.rotation.x = T_wb.so3().unit_quaternion().x();
+            transformStamped_T_wb.transform.rotation.y = T_wb.so3().unit_quaternion().y();
+            transformStamped_T_wb.transform.rotation.z = T_wb.so3().unit_quaternion().z();
+            transformStamped_T_wb.transform.rotation.w = T_wb.so3().unit_quaternion().w();
+            br.sendTransform(transformStamped_T_wb);
+            //br2.sendTransform(transformStamped_T_bs);
         }
 
         PointCloudP_ptr cloud (new PointCloudP);

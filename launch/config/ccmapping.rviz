@@ -6,10 +6,9 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /TF1/Tree1/world1
-        - /Pose1/Status1
-        - /PointCloud21/Status1
-      Splitter Ratio: 0.31294116377830505
+        - /TF1
+        - /TF1/Tree1
+      Splitter Ratio: 0.5230262875556946
     Tree Height: 485
   - Class: rviz/Selection
     Name: Selection
@@ -60,6 +59,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        body_frame:
+          Value: true
         camera_depth_optical_frame:
           Value: true
         world:
@@ -71,8 +72,7 @@ Visualization Manager:
       Show Names: true
       Tree:
         world:
-          camera_depth_optical_frame:
-            {}
+          {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -86,28 +86,6 @@ Visualization Manager:
       Queue Size: 2
       Transport Hint: raw
       Unreliable: false
-      Value: true
-    - Alpha: 1
-      Axes Length: 1
-      Axes Radius: 0.10000000149011612
-      Class: rviz/Pose
-      Color: 255; 25; 0
-      Enabled: true
-      Head Length: 0.30000001192092896
-      Head Radius: 0.10000000149011612
-      Name: Pose
-      Shaft Length: 1
-      Shaft Radius: 0.05000000074505806
-      Shape: Arrow
-      Topic: /vrpn_client_node/xtion2/pose
-      Unreliable: false
-      Value: true
-    - Class: rviz/Axes
-      Enabled: true
-      Length: 10
-      Name: Axes
-      Radius: 0.05000000074505806
-      Reference Frame: <Fixed Frame>
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -139,6 +117,27 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        body_frame:
+          Value: true
+        camera_depth_optical_frame:
+          Value: true
+        world:
+          Value: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        world:
+          {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -167,7 +166,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 37.235679626464844
+      Distance: 3.0704081058502197
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -182,10 +181,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: -0.17020349204540253
+      Pitch: 0.21479719877243042
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.658559799194336
+      Yaw: 4.283542633056641
     Saved: ~
 Window Geometry:
   Displays:

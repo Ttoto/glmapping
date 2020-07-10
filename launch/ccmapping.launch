@@ -18,7 +18,6 @@
           <param name="num_worker_threads" value="2" />
     </node>
 
-    <!-- TrackingNode -->
     <node pkg="nodelet" type="nodelet" args="load ccmapping/LocalMapNodeletClass ccmapping_nodelet_manager"
         name="LocalMapNodeletClass_loader" output="screen"
         launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
