@@ -129,7 +129,7 @@ void cc_local_map::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
         {
             if(grid.is_occupied)
             {
-                T_wl.translation()-
+                Vec3 t_diff = T_wl.translation()-this->last_T_wl.translation();
                         //    for(auto& grid:this->map)
                         //    {
                         //        grid.is_occupied = false;

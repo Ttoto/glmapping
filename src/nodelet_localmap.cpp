@@ -15,6 +15,7 @@
 #include <cc_local_map.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <cc_rviz_vis.h>
 
 namespace ccmapping_ns
 {
@@ -44,10 +45,13 @@ private:
     string frame_id;
     string body_frame_id;
     string sensor_frame_id;
+    string local_frame_id;
     SE3 T_bs;
     tf2_ros::TransformBroadcaster br;
     geometry_msgs::TransformStamped transformStamped_T_wb;
+    geometry_msgs::TransformStamped transformStamped_T_wl;
     geometry_msgs::TransformStamped transformStamped_T_bs;
+    cc_rviz_vis *localmap_publisher;
 
     virtual void onInit()
     {
@@ -66,11 +70,13 @@ private:
         bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
         publish_T_wb          = getBoolVariableFromYaml(configFilePath,"publish_T_wb");
         publish_T_bs          = getBoolVariableFromYaml(configFilePath,"publish_T_bs");
-        frame_id              = getStringFromYaml(configFilePath,"frame_id");
+        frame_id              = getStringFromYaml(configFilePath,"world_frame_id");
         body_frame_id         = getStringFromYaml(configFilePath,"body_frame_id");
         sensor_frame_id       = getStringFromYaml(configFilePath,"sensor_frame_id");
+        local_frame_id        = getStringFromYaml(configFilePath,"localmap_frame_id");
         T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
                    T_bs_mat.topRightCorner(3,1));
+        localmap_publisher =  new cc_rviz_vis(nh,"localmap_cc",local_frame_id,3,-n_Z_below*d_Z,n_Z_over*d_Z);
 
         transformStamped_T_wb.header.frame_id = frame_id;
         transformStamped_T_wb.child_frame_id  = body_frame_id;
@@ -81,6 +87,8 @@ private:
         transformStamped_T_wb.transform.rotation.y = 0;
         transformStamped_T_wb.transform.rotation.z = 0;
         transformStamped_T_wb.transform.rotation.w = 1;
+        transformStamped_T_wl=transformStamped_T_wb;
+        transformStamped_T_wl.child_frame_id = local_frame_id;
 
         transformStamped_T_bs.header.frame_id = body_frame_id;
         transformStamped_T_bs.child_frame_id  = sensor_frame_id;
@@ -121,6 +129,8 @@ private:
         ros::Rate rate(10.0);
         while(1)
         {
+            transformStamped_T_wl.header.stamp = ros::Time::now();
+            br.sendTransform(transformStamped_T_wl);
             if(publish_T_wb)
             {
                 transformStamped_T_wb.header.stamp = ros::Time::now();
@@ -142,6 +152,16 @@ private:
         static int i=0;
         cout << "in the callback " << i++ << endl;
 
+//        vector<Vec3> pts;
+//        for(double i=0; i<5.0; i+=0.2)
+//        {
+//            pts.push_back(Vec3(0,0,i));
+//            pts.push_back(Vec3(i,0,0));
+//            pts.push_back(Vec3(i,i,i));
+//            pts.push_back(Vec3(0,i,0));
+//        }
+//        this->localmap_publisher->pub_localmap(pts,pose_Ptr->header.stamp);
+
         SE3 T_wb(SO3(Quaterniond(pose_Ptr->pose.orientation.w,
                                  pose_Ptr->pose.orientation.x,
                                  pose_Ptr->pose.orientation.y,
@@ -162,7 +182,10 @@ private:
             transformStamped_T_wb.transform.rotation.z = T_wb.so3().unit_quaternion().z();
             transformStamped_T_wb.transform.rotation.w = T_wb.so3().unit_quaternion().w();
             br.sendTransform(transformStamped_T_wb);
-            //br2.sendTransform(transformStamped_T_bs);
+
+            transformStamped_T_wl.header.stamp = pose_Ptr->header.stamp;
+            transformStamped_T_wl.transform.translation = transformStamped_T_wb.transform.translation;
+            br.sendTransform(transformStamped_T_wl);
         }
 
         PointCloudP_ptr cloud (new PointCloudP);
@@ -176,7 +199,7 @@ private:
         }
         int pcsize = static_cast<int>(cloud->size());
         vector<Vec3> pc_eigen;
-        for(int i=1; i<1000; i++)
+        for(int i=0; i<1000; i++)
         {
             size_t rand_idx = static_cast<size_t>(rand() % pcsize);
             PointP pt = cloud->at(rand_idx);
@@ -185,6 +208,7 @@ private:
                                     static_cast<double>(pt.z)));
         }
         local_map->input_pc_pose(pc_eigen,T_wb);
+        this->localmap_publisher->pub_localmap(local_map->visualization_grid_list,pose_Ptr->header.stamp);
         update_time.toc("update time");
         //local_map
     }

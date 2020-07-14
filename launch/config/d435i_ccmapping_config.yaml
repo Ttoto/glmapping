@@ -4,18 +4,18 @@
 #Localmap radius d_Rho*n_Rho
 #devition of orientation 360/d_Phi_deg
 #Number of grid n_Rho*(360/d_Phi)*(nz_below+nz_over)
-ccmapping_d_Rho:    0.1 
-ccmapping_d_Phi_deg: 10
-ccmapping_d_Z:      0.1
-ccmapping_n_Rho:     70
-ccmapping_n_Z_below: 20
-ccmapping_n_Z_over:  20
+ccmapping_d_Rho:     0.15
+ccmapping_d_Phi_deg:    3
+ccmapping_d_Z:        0.1
+ccmapping_n_Rho:       40
+ccmapping_n_Z_below:   15
+ccmapping_n_Z_over:    15
 
 
 use_exactsync:    false
 
 publish_T_wb:      true
-frame_id:          "map"
+world_frame_id:    "map"
 body_frame_id:     "body_frame"
 
 publish_T_bs:      true
@@ -28,4 +28,4 @@ T_B_S:
 sensor_frame_id:   "camera_depth_optical_frame"
 
 ##localmap_frame_base: tranlation is link to body frame, no rotation
-localmap_frame_id: "localmap_frame_base"
+localmap_frame_id: "localmap_frame"

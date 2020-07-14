@@ -21,8 +21,11 @@ public:
     int map_nZ;
     int map_center_z_idx;
 
-
+    vector<Vec3> visualization_grid_list;
     vector<cc_agrid> map;
+    vector<cc_agrid> map_tmp;
+    SE3 last_T_wl;
+    bool first_input;
     size_t mapIdx(Vec3I Rho_Phi_z);
     size_t mapIdx(int Rho, int Phi, int z);
     cc_local_map();
@@ -30,6 +33,8 @@ public:
     void init_map(double d_Rho, double d_Phi_deg, double d_Z, int n_Rho, int n_z_below, int n_z_over);
     void creat_map();
     void creat_transfer_chart();
+    Vec3I xyz2RhoPhiZ(Vec3 xyz_l);
+    bool  xyz2RhoPhiZwithBoderCheck(Vec3 xyz_l, Vec3I &rhophiz);
     void input_pc_pose(vector<Vec3> PC_s, SE3 T_wb);
 
 };
