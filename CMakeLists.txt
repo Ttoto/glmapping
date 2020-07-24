@@ -55,9 +55,12 @@ include_directories(SYSTEM
 add_library(ccmapping
     src/nodelet_globalmap.cpp
     src/nodelet_localmap.cpp
-    src/cc_local_map.cpp
-    src/cc_agrid.cpp
-    src/cc_rviz_vis.cpp
+    src/cylindrical_cell.cpp
+    src/local_map_cylindrical.cpp
+    src/cartesian_cell.cpp
+    src/global_map_cartesian.cpp
+    src/rviz_vis.cpp
+    src/msg_local2global.cpp
     )
 
 add_dependencies(ccmapping

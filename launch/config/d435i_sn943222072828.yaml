@@ -5,8 +5,8 @@
 type_of_vi: 0
 #depth image is aligned to left cam0
 image_width: 640
-image_height: 480
-cam0_intrinsics: [384.16455078125, 384.16455078125, 320.2144470214844, 238.94403076171875]#fx fy cx cy
+image_height: 360
+cam0_intrinsics: [320.1371154785156, 320.1371154785156, 320.1787109375, 179.12002563476562]#fx fy cx cy
 cam0_distortion_coeffs: [0.0, 0.0, 0.0, 0.0]#k1 k2 r1 r2
 T_imu_cam0:
 [ 0.0,  0.0,  1.0,  0.0,
@@ -14,7 +14,7 @@ T_imu_cam0:
   0.0, -1.0,  0.0,  0.0,
   0.0,  0.0,  0.0,  1.0]
 
-is_lite_version:   True
+is_lite_version:   False
 
 ##vifusion parameter
 #Madgwick beta

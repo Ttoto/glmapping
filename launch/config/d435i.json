@@ -89,7 +89,7 @@
     "param-zunits": "1000",
     "stream-depth-format": "Z16",
     "stream-fps": "30",
-    "stream-height": "480",
+    "stream-height": "360",
     "stream-ir-format": "Y8",
     "stream-width": "640"
 }

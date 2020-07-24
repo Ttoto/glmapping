@@ -19,14 +19,14 @@
     </node>
 
     <node pkg="nodelet" type="nodelet" args="load ccmapping/LocalMapNodeletClass ccmapping_nodelet_manager"
-        name="LocalMapNodeletClass_loader" output="screen"
+        name="ccmapping_LocalMapNodeletClass_loader" output="screen"
         launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
         <remap from="/ccmapping/pc"          to="/camera/depth/points"/>
         <remap from="/ccmapping/pose"        to="/vrpn_client_node/xtion2/pose"/>
     </node>
 
     <node pkg="nodelet" type="nodelet" args="load ccmapping/GlobalMapNodeletClass ccmapping_nodelet_manager"
-        name="GlobalMapNodeletClass_loader" output="screen"
+        name="ccmapping_GlobalMapNodeletClass_loader" output="screen"
         launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
     </node>
 

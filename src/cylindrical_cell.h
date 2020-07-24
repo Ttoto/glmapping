@@ -1,9 +1,9 @@
-#ifndef CC_AGRID_H
-#define CC_AGRID_H
+#ifndef CYLINDERICAL_CELL_H
+#define CYLINDERICAL_CELL_H
 
 #include <utils/include/all_utils.h>
 
-class cc_agrid
+class cylindrical_cell
 {
 public:
     int idx_rho;
@@ -11,18 +11,18 @@ public:
     int idx_z;
     Vec3 sampled_xyz;
     bool is_occupied;
-    float_t probability;
+    float probability;
 
 
     Vec3 vis_pt;
     double vis_radius;
 
 
-    cc_agrid();
-    cc_agrid(int Rho, int Phi, int Z, Vec3 vis_xyz);
+    cylindrical_cell();
+    cylindrical_cell(int Rho, int Phi, int Z, Vec3 vis_xyz);
 
     bool obervation_update(SE3 pose, Vec3 xyz_l);
     bool occlusion_update();
 };
 
-#endif // CC_AGRID_H
+#endif // CYLINDERICAL_CELL_H

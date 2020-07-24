@@ -12,10 +12,11 @@
 #include <tf2_ros/transform_broadcaster.h>
 
 #include <utils/include/all_utils.h>
-#include <cc_local_map.h>
+#include <local_map_cylindrical.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <cc_rviz_vis.h>
+#include <rviz_vis.h>
+#include <msg_local2global.h>
 
 namespace ccmapping_ns
 {
@@ -36,8 +37,8 @@ private:
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, geometry_msgs::PoseStamped> ApproxSyncPolicy;
     message_filters::Synchronizer<ApproxSyncPolicy> * approxSync_;
 
-
-    cc_local_map* local_map;
+    msg_local2global*      l2g_pub;
+    local_map_cylindrical* local_map;
     bool enable_downsample;
     int  downsample_size;
     bool   publish_T_wb;
@@ -51,21 +52,22 @@ private:
     geometry_msgs::TransformStamped transformStamped_T_wb;
     geometry_msgs::TransformStamped transformStamped_T_wl;
     geometry_msgs::TransformStamped transformStamped_T_bs;
-    cc_rviz_vis *localmap_publisher;
+    rviz_vis *localmap_publisher;
 
     virtual void onInit()
     {
+        cout << "localmapnode:" << endl;
         ros::NodeHandle& nh = getMTPrivateNodeHandle();
         string configFilePath;
         nh.getParam("/ccmapping_configfile",   configFilePath);
         cout << "read the config file" << endl;
 
-        double d_Rho          = getDoubleVariableFromYaml(configFilePath,"ccmapping_d_Rho");
-        double d_Phi_deg      = getDoubleVariableFromYaml(configFilePath,"ccmapping_d_Phi_deg");
-        double d_Z            = getDoubleVariableFromYaml(configFilePath,"ccmapping_d_Z");
-        int    n_Rho          = getIntVariableFromYaml(configFilePath,"ccmapping_n_Rho");
-        int    n_Z_below      = getIntVariableFromYaml(configFilePath,"ccmapping_n_Z_below");
-        int    n_Z_over       = getIntVariableFromYaml(configFilePath,"ccmapping_n_Z_over");
+        double d_Rho          = getDoubleVariableFromYaml(configFilePath,"ccmapping_lm_d_Rho");
+        double d_Phi_deg      = getDoubleVariableFromYaml(configFilePath,"ccmapping_lm_d_Phi_deg");
+        double d_Z            = getDoubleVariableFromYaml(configFilePath,"ccmapping_lm_d_Z");
+        int    n_Rho          = getIntVariableFromYaml(configFilePath,"ccmapping_lm_n_Rho");
+        int    n_Z_below      = getIntVariableFromYaml(configFilePath,"ccmapping_lm_n_Z_below");
+        int    n_Z_over       = getIntVariableFromYaml(configFilePath,"ccmapping_lm_n_Z_over");
         Mat4x4  T_bs_mat      = Mat44FromYaml(configFilePath,"T_B_S");
         bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
         publish_T_wb          = getBoolVariableFromYaml(configFilePath,"publish_T_wb");
@@ -76,7 +78,8 @@ private:
         local_frame_id        = getStringFromYaml(configFilePath,"localmap_frame_id");
         T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
                    T_bs_mat.topRightCorner(3,1));
-        localmap_publisher =  new cc_rviz_vis(nh,"localmap_cc",local_frame_id,3,-n_Z_below*d_Z,n_Z_over*d_Z);
+        localmap_publisher =  new rviz_vis(nh,"localmap_cc",local_frame_id,3,-n_Z_below*d_Z,n_Z_over*d_Z);
+        l2g_pub =  new msg_local2global(nh,"/local2global",2);
 
         transformStamped_T_wb.header.frame_id = frame_id;
         transformStamped_T_wb.child_frame_id  = body_frame_id;
@@ -104,7 +107,7 @@ private:
         downsample_size   = 1000;
 
         //init map
-        local_map = new cc_local_map();
+        local_map = new local_map_cylindrical();
         local_map->setTbs(T_bs);
         local_map->init_map(d_Rho,d_Phi_deg,d_Z,n_Rho,n_Z_below,n_Z_over);
 
@@ -150,7 +153,7 @@ private:
     {
         tic_toc_ros update_time;
         static int i=0;
-        cout << "in the callback " << i++ << endl;
+        //cout << "in the callback " << i++ << endl;
 
 //        vector<Vec3> pts;
 //        for(double i=0; i<5.0; i+=0.2)
@@ -208,8 +211,9 @@ private:
                                     static_cast<double>(pt.z)));
         }
         local_map->input_pc_pose(pc_eigen,T_wb);
-        this->localmap_publisher->pub_localmap(local_map->visualization_grid_list,pose_Ptr->header.stamp);
-        update_time.toc("update time");
+        this->localmap_publisher->pub_localmap(local_map->visualization_cell_list,pose_Ptr->header.stamp);
+        l2g_pub->pub(local_map->l2g_msg_T_wl,local_map->l2g_msg_obs_pts_l,local_map->l2g_msg_miss_pts_l,pose_Ptr->header.stamp);
+        //update_time.toc("update time");
         //local_map
     }
 
