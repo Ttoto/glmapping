@@ -12,13 +12,16 @@ ccmapping_lm_n_Z_below:  15
 ccmapping_lm_n_Z_over:   15
 
 #Golbalmap papameter
-ccmapping_gm_d_x:       0.3
-ccmapping_gm_n_x:       200
-ccmapping_gm_d_z:       0.3
-ccmapping_gm_n_z:       200
-ccmapping_gm_d_z:       0.2
-ccmapping_gm_n_z:        10
-ccmapping_gm_min_z:    -1.0
+ccmapping_gm_d_x:             0.3
+ccmapping_gm_n_x:             200
+ccmapping_gm_d_z:             0.3
+ccmapping_gm_n_z:             200
+ccmapping_gm_d_z:             0.2
+ccmapping_gm_n_z:              10
+ccmapping_gm_min_z:          -1.0
+ccmapping_gm_measurement_cnt:  20
+ccmapping_gm_occupied_p_sh:  0.95
+ccmapping_gm_free_p_sh:       0.2
 
 
 use_exactsync:    false

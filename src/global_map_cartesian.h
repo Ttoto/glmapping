@@ -14,6 +14,10 @@ private:
     double z_border_max;
     SE3 T_bs; //Transformation from sensor to body
     bool visibility_check;
+    int measurement_cnt_max;
+    int measurement_cnt_min;
+    int occupied_measurement_cnt;
+    int free_measurement_cnt;
 
 public:
 
@@ -25,6 +29,7 @@ public:
     int map_nz;
     double map_min_z;
 
+
     vector<Vec3> visualization_cell_list;
     vector<cartesian_cell> map;
     SE3 last_T_wl;
@@ -33,12 +38,15 @@ public:
     size_t mapIdx(int x_idx, int y_idx, int z_idx);
     global_map_cartesian();
     void setTbs(SE3 T_bs_in);
-    void init_map(double d_x, double d_y, double d_z, int n_x, int n_y, int n_z, double min_z);
+    void init_map(double d_x, double d_y, double d_z,
+                  int n_x, int n_y, int n_z, double min_z,
+                  int measurement_volume = 20,
+                  double occupied_sh=0.7, double free_sh=-0.4);
     void creat_map();
     void creat_transfer_chart();
     Vec3I xyz2xyzIdx(Vec3 xyz_l);
     bool  xyz2xyzIdxwithBoderCheck(Vec3 xyz_l, Vec3I &xyz_idx);
-    void  input_pc_pose(vector<Vec3> PC_l, SE3 T_wl);
+    void  input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss_l, SE3 T_wl);
 
 };
 

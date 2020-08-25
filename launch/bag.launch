@@ -1,7 +1,8 @@
 <launch>
     <param name ="/use_sim_time" value="true"/>
+    <!--sim_planner1-->
 <!--Input######################################################################################################-->
-    <node pkg="rosbag" type="play" name="rosbag" args="$(find ccmapping)/bag/office.bag --clock"
+    <node pkg="rosbag" type="play" name="rosbag" args="$(find ccmapping)/bag/sim_planner4.bag --clock"
         launch-prefix="bash -c 'sleep 2; $0 $@' ">
     </node>
 
@@ -22,7 +23,7 @@
         name="ccmapping_LocalMapNodeletClass_loader" output="screen"
         launch-prefix="bash -c 'sleep 2; $0 $@' ">
         <remap from="/ccmapping/pc"          to="/camera/depth/color/points"/>
-        <remap from="/ccmapping/pose"        to="/imu_pose"/>
+        <remap from="/ccmapping/pose"        to="/mavros/local_position/pose"/>
     </node>
 
     <node pkg="nodelet" type="nodelet" args="load ccmapping/GlobalMapNodeletClass ccmapping_nodelet_manager"

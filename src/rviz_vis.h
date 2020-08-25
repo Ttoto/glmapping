@@ -11,7 +11,7 @@ public:
     rviz_vis();
     ~rviz_vis();
 
-    ros::Publisher localmap_pub;
+    ros::Publisher map_pub;
     string localmap_frame_id;
     string global_frame_id;
     double min_z;

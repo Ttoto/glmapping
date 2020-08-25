@@ -4,21 +4,25 @@
 #Localmap radius d_Rho*n_Rho
 #devition of orientation 360/d_Phi_deg
 #Number of grid n_Rho*(360/d_Phi)*(nz_below+nz_over)
-ccmapping_lm_d_Rho:     0.2
-ccmapping_lm_d_Phi_deg:   2
-ccmapping_lm_d_Z:       0.1
+ccmapping_lm_d_Rho:     0.3
+ccmapping_lm_d_Phi_deg:   3
+ccmapping_lm_d_Z:       0.2
 ccmapping_lm_n_Rho:      20
 ccmapping_lm_n_Z_below:  15
-ccmapping_lm_n_Z_over:    2
+ccmapping_lm_n_Z_over:   15
 
 #Golbalmap papameter
-ccmapping_gm_d_x:       0.3
-ccmapping_gm_n_x:       200
-ccmapping_gm_d_y:       0.3
-ccmapping_gm_n_y:       200
-ccmapping_gm_d_z:       0.2
-ccmapping_gm_n_z:        10
-ccmapping_gm_min_z:    -1.0
+ccmapping_gm_d_x:             0.1
+ccmapping_gm_n_x:             500
+ccmapping_gm_d_y:             0.1
+ccmapping_gm_n_y:             500
+ccmapping_gm_d_z:             0.1
+ccmapping_gm_n_z:              40
+ccmapping_gm_min_z:           0.1
+ccmapping_gm_measurement_cnt:  10
+#from 0.01 to 0.99
+ccmapping_gm_occupied_p_sh:   0.9
+ccmapping_gm_free_p_sh:       0.1
 
 use_exactsync:    false
 

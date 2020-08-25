@@ -17,7 +17,7 @@ rviz_vis::rviz_vis(ros::NodeHandle& nh,
                          double minz,
                          double maxz)
 {
-    this->localmap_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffer_size);
+    this->map_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffer_size);
     this->localmap_frame_id = frame_id;
     this->min_z = minz;
     this->max_z = maxz;
@@ -33,7 +33,7 @@ rviz_vis::rviz_vis(ros::NodeHandle& nh,
                    double gm_cube_size_xy,
                    double gm_cube_size_z)
 {
-    this->localmap_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffer_size);
+    this->map_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffer_size);
     this->global_frame_id = frame_id;
     this->cube_size_xy = gm_cube_size_xy;
     this->cube_size_z = gm_cube_size_z;
@@ -105,10 +105,10 @@ void rviz_vis::pub_localmap(const vector<Vec3> &pts3d, const ros::Time stamp)
         color.r= static_cast<float>(rgb(0));
         color.g= static_cast<float>(rgb(1));
         color.b= static_cast<float>(rgb(2));
-        color.a=0.8;
+        color.a= static_cast<float>(0.8);
         spheres.colors.push_back(color);
     }
-    this->localmap_pub.publish(spheres);
+    this->map_pub.publish(spheres);
 }
 
 void rviz_vis::pub_globalmap(const vector<Vec3> &pts3d, const ros::Time stamp)
@@ -135,8 +135,8 @@ void rviz_vis::pub_globalmap(const vector<Vec3> &pts3d, const ros::Time stamp)
         color.r= static_cast<float>(rgb(0));
         color.g= static_cast<float>(rgb(1));
         color.b= static_cast<float>(rgb(2));
-        color.a=0.2;
+        color.a= static_cast<float>(0.2);
         cubes.colors.push_back(color);
     }
-    this->localmap_pub.publish(cubes);
+    this->map_pub.publish(cubes);
 }

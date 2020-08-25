@@ -29,7 +29,8 @@ private:
         ros::Time stamp;
         msg_local2global::unpack(msg,T_wl,l2g_obs_l,l2g_miss_l,stamp);
         cout << "obs pt" << l2g_obs_l.size() << endl;
-        global_map->input_pc_pose(l2g_obs_l,T_wl);
+        cout << "miss pt" << l2g_miss_l.size() << endl;
+        global_map->input_pc_pose(l2g_obs_l,l2g_miss_l,T_wl);
         globalmap_publisher->pub_globalmap(global_map->visualization_cell_list,stamp);
     }
 
@@ -47,10 +48,15 @@ private:
         int    n_x  = getIntVariableFromYaml(configFilePath,"ccmapping_gm_n_x");
         int    n_y  = getIntVariableFromYaml(configFilePath,"ccmapping_gm_n_y");
         int    n_z  = getIntVariableFromYaml(configFilePath,"ccmapping_gm_n_z");
-        double min_z = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_min_z");
+        double min_z       = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_min_z");
+        int    measure_cnt = getIntVariableFromYaml(configFilePath,"ccmapping_gm_measurement_cnt");
+        double occupied_sh = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_occupied_p_sh");
+        double free_sh     = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_free_p_sh");
+
 
         global_map = new global_map_cartesian();
-        global_map->init_map(d_x,d_y,d_z,n_x,n_y,n_z,min_z);
+        global_map->init_map(d_x,d_y,d_z,n_x,n_y,n_z,min_z,
+                             measure_cnt,occupied_sh,free_sh);
         double max_z=min_z+(d_z*n_z);
         globalmap_publisher =  new rviz_vis(nh,"/globalmap","map",2,min_z,max_z,d_x,d_z);
         sub_from_local = nh.subscribe<ccmapping::local2global>(

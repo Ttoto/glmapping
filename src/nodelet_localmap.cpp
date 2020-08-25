@@ -78,7 +78,7 @@ private:
         local_frame_id        = getStringFromYaml(configFilePath,"localmap_frame_id");
         T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
                    T_bs_mat.topRightCorner(3,1));
-        localmap_publisher =  new rviz_vis(nh,"localmap_cc",local_frame_id,3,-n_Z_below*d_Z,n_Z_over*d_Z);
+        localmap_publisher =  new rviz_vis(nh,"/localmap",local_frame_id,3,-n_Z_below*d_Z,n_Z_over*d_Z);
         l2g_pub =  new msg_local2global(nh,"/local2global",2);
 
         transformStamped_T_wb.header.frame_id = frame_id;
@@ -154,16 +154,6 @@ private:
         tic_toc_ros update_time;
         static int i=0;
         //cout << "in the callback " << i++ << endl;
-
-//        vector<Vec3> pts;
-//        for(double i=0; i<5.0; i+=0.2)
-//        {
-//            pts.push_back(Vec3(0,0,i));
-//            pts.push_back(Vec3(i,0,0));
-//            pts.push_back(Vec3(i,i,i));
-//            pts.push_back(Vec3(0,i,0));
-//        }
-//        this->localmap_publisher->pub_localmap(pts,pose_Ptr->header.stamp);
 
         SE3 T_wb(SO3(Quaterniond(pose_Ptr->pose.orientation.w,
                                  pose_Ptr->pose.orientation.x,

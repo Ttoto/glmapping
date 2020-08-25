@@ -1,6 +1,5 @@
 #ifndef CARTESIAN_CELL_H
 #define CARTESIAN_CELL_H
-
 #include <utils/include/all_utils.h>
 
 class cartesian_cell
@@ -11,7 +10,7 @@ public:
     int idx_z;
     Vec3 sampled_xyz;
     bool is_occupied;
-    float probability;
+    int  measurement_times;
 
 
     Vec3 vis_pt;

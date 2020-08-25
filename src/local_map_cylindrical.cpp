@@ -147,16 +147,17 @@ void local_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
         Vec3I rpz_idx;
         if(xyz2RhoPhiZwithBoderCheck(p_l,rpz_idx))
         {
-            if(visibility_check)
-            {
-                for (int r=rpz_idx[0]; r>0 ; r--) {
-                    map.at(this->mapIdx(Vec3I(r,rpz_idx[1],rpz_idx[2]))).is_occupied = false;
-                }
-            }
             //set observerable
             map.at(this->mapIdx(rpz_idx)).is_occupied = true;
             map.at(this->mapIdx(rpz_idx)).sampled_xyz = p_l;
             l2g_msg_obs_pts_l.push_back(p_l);
+            if(visibility_check)
+            {
+                for (int r=rpz_idx[0]-1; r>0 ; r--) {
+                    map.at(this->mapIdx(Vec3I(r,rpz_idx[1],rpz_idx[2]))).is_occupied = false;
+                    l2g_msg_miss_pts_l.push_back(map.at(this->mapIdx(Vec3I(r,rpz_idx[1],rpz_idx[2]))).vis_pt);
+                }
+            }
         }else
         {
         }
@@ -171,6 +172,6 @@ void local_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
         }
     }
     this->last_T_wl = T_wl;
-    //cout << "vis size" << visualization_cell_list.size() << endl;
+    cout << "local map vis size" << visualization_cell_list.size() << endl;
 
 }

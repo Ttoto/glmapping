@@ -8,10 +8,6 @@ Panels:
         - /Status1
         - /TF1/Frames1
         - /TF1/Tree1
-        - /PointCloud21
-        - /Path1
-        - /Marker1
-        - /Pose1
       Splitter Ratio: 0.5230262875556946
     Tree Height: 449
   - Class: rviz/Selection
@@ -94,7 +90,7 @@ Visualization Manager:
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud2
-      Color: 136; 138; 133
+      Color: 239; 41; 41
       Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
@@ -117,7 +113,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /vo_img0
+      Image Topic: /camera/infra1/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -152,7 +148,15 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /ccmapping_LocalMapNodeletClass_loader/localmap_cc
+      Marker Topic: /localmap
+      Name: Marker
+      Namespaces:
+        points: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /globalmap
       Name: Marker
       Namespaces:
         points: true
@@ -172,14 +176,6 @@ Visualization Manager:
       Shape: Arrow
       Topic: /imu_pose
       Unreliable: false
-      Value: true
-    - Class: rviz/Marker
-      Enabled: true
-      Marker Topic: /globalmap
-      Name: Marker
-      Namespaces:
-        {}
-      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -209,7 +205,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 48.441837310791016
+      Distance: 37.31067657470703
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -224,10 +220,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 0.019795168191194534
       Target Frame: body_frame
       Value: ThirdPersonFollower (rviz)
-      Yaw: 3.1376118659973145
+      Yaw: 4.107626914978027
     Saved: ~
 Window Geometry:
   Displays:

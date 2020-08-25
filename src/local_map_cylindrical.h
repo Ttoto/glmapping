@@ -26,7 +26,8 @@ public:
     vector<Vec3> l2g_msg_obs_pts_l;
     vector<Vec3> l2g_msg_miss_pts_l;
     SE3 l2g_msg_T_wl;
-
+    vector<Vec3> occupied_cell_list;
+    vector<Vec3> missed_cell_list;
     vector<Vec3> visualization_cell_list;
     vector<cylindrical_cell> map;
     vector<cylindrical_cell> map_tmp;
