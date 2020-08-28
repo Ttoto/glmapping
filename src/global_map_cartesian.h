@@ -31,6 +31,7 @@ public:
 
 
     vector<Vec3> visualization_cell_list;
+    vector<Vec3I> occupied_cell_idx_list;
     vector<cartesian_cell> map;
     SE3 last_T_wl;
     bool first_input;

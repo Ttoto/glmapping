@@ -23,6 +23,7 @@ public:
     int map_nPhi;
     int map_nZ;
     int map_center_z_idx;
+    double observation_range;
     vector<Vec3> l2g_msg_obs_pts_l;
     vector<Vec3> l2g_msg_miss_pts_l;
     SE3 l2g_msg_T_wl;

@@ -61,6 +61,7 @@ add_library(ccmapping
     src/global_map_cartesian.cpp
     src/rviz_vis.cpp
     src/msg_local2global.cpp
+    src/global2occupancygrid2d.cpp
     )
 
 add_dependencies(ccmapping

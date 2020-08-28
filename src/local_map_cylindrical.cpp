@@ -37,6 +37,7 @@ void local_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double d_Z,
     map_tmp = map;
     first_input = true;
     visibility_check = true;
+    this->observation_range = sqrt(pow(map_nRho*map_dRho,2)+pow(map_nZ*map_dZ,2));
 }
 
 void local_map_cylindrical::creat_map(void)
@@ -145,12 +146,15 @@ void local_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
     for(auto p_l:PC_l)
     {
         Vec3I rpz_idx;
+        if(p_l.norm()<observation_range)
+        {
+            l2g_msg_obs_pts_l.push_back(p_l);
+        }
         if(xyz2RhoPhiZwithBoderCheck(p_l,rpz_idx))
         {
             //set observerable
             map.at(this->mapIdx(rpz_idx)).is_occupied = true;
             map.at(this->mapIdx(rpz_idx)).sampled_xyz = p_l;
-            l2g_msg_obs_pts_l.push_back(p_l);
             if(visibility_check)
             {
                 for (int r=rpz_idx[0]-1; r>0 ; r--) {
@@ -172,6 +176,6 @@ void local_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
         }
     }
     this->last_T_wl = T_wl;
-    cout << "local map vis size" << visualization_cell_list.size() << endl;
+    //cout << "local map vis size" << visualization_cell_list.size() << endl;
 
 }

@@ -8,17 +8,17 @@ ccmapping_lm_d_Rho:     0.3
 ccmapping_lm_d_Phi_deg:   3
 ccmapping_lm_d_Z:       0.2
 ccmapping_lm_n_Rho:      20
-ccmapping_lm_n_Z_below:  15
-ccmapping_lm_n_Z_over:   15
+ccmapping_lm_n_Z_below:  10
+ccmapping_lm_n_Z_over:   10
 
 #Golbalmap papameter
 ccmapping_gm_d_x:             0.1
-ccmapping_gm_n_x:             500
+ccmapping_gm_n_x:             400
 ccmapping_gm_d_y:             0.1
-ccmapping_gm_n_y:             500
-ccmapping_gm_d_z:             0.1
-ccmapping_gm_n_z:              40
-ccmapping_gm_min_z:           0.1
+ccmapping_gm_n_y:             400
+ccmapping_gm_d_z:             0.2
+ccmapping_gm_n_z:              15
+ccmapping_gm_min_z:           0.3
 ccmapping_gm_measurement_cnt:  10
 #from 0.01 to 0.99
 ccmapping_gm_occupied_p_sh:   0.9
@@ -33,7 +33,7 @@ body_frame_id:     "body_frame"
 publish_T_bs:      true
 ##transformation from sensor frame to body frame
 T_B_S:
-[  0.0,   0.0,  1.0,  0.0,
+[  0.0,   0.0,  1.0,  0.12,
   -1.0,   0.0,  0.0,  0.0,
    0.0,  -1.0,  0.0,  0.0,
    0.0,   0.0,  0.0,  1.0]

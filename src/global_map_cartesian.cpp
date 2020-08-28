@@ -19,11 +19,11 @@ global_map_cartesian::global_map_cartesian()
 
 }
 
-inline size_t global_map_cartesian::mapIdx(Vec3I xyz_idx)
+size_t global_map_cartesian::mapIdx(Vec3I xyz_idx)
 {
     return this->mapIdx(xyz_idx(0),xyz_idx(1),xyz_idx(2));
 }
-inline size_t global_map_cartesian::mapIdx(int x_idx, int y_idx, int z_idx)
+size_t global_map_cartesian::mapIdx(int x_idx, int y_idx, int z_idx)
 {
     return static_cast<size_t>( z_idx*this->map_nx_times_ny
                                 +y_idx*this->map_nx
@@ -131,7 +131,6 @@ bool global_map_cartesian::xyz2xyzIdxwithBoderCheck(Vec3 xyz_l, Vec3I &xyz_idx)
 void global_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss_l, SE3 T_wl)
 {
     //Frame [w]orld, [s]ensor, [b]ody, [l]ocalmap;
-    cout << PC_l.size() << endl;
     vector<Vec3> pc_w;
     vector<Vec3> pc_miss_w;
     for(auto p_l:PC_l)
@@ -142,7 +141,6 @@ void global_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss
     {
         pc_miss_w.push_back(T_wl*p_l);
     }
-
     //STEP 2: Add measurement
     for(auto p_w:pc_w)
     {
@@ -183,18 +181,18 @@ void global_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss
         {
         }
     }
-
-
     //Update occupied list;
     visualization_cell_list.clear();
+    occupied_cell_idx_list.clear();
     for(auto cell:this->map)
     {
         if(cell.is_occupied)
         {
+            occupied_cell_idx_list.push_back(Vec3I(cell.idx_x,cell.idx_y,cell.idx_z));
             visualization_cell_list.push_back(cell.vis_pt);
         }
     }
     this->last_T_wl = T_wl;
-    cout << "vis size" << visualization_cell_list.size() << endl;
+    //cout << "globalmap vis size" << visualization_cell_list.size() << endl;
 
 }

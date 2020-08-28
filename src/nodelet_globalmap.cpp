@@ -6,6 +6,7 @@
 #include <global_map_cartesian.h>
 #include <msg_local2global.h>
 #include <rviz_vis.h>
+#include <global2occupancygrid2d.h>
 
 namespace ccmapping_ns
 {
@@ -20,6 +21,7 @@ private:
     ros::Subscriber sub_from_local;
     global_map_cartesian* global_map;
     rviz_vis *globalmap_publisher;
+    Global2OccupancyGrid2D *occupancy_grid_publisher;
 
     void from_lm_callback(const ccmapping::local2globalConstPtr& msg)
     {
@@ -28,10 +30,9 @@ private:
         vector<Vec3> l2g_miss_l;
         ros::Time stamp;
         msg_local2global::unpack(msg,T_wl,l2g_obs_l,l2g_miss_l,stamp);
-        cout << "obs pt" << l2g_obs_l.size() << endl;
-        cout << "miss pt" << l2g_miss_l.size() << endl;
         global_map->input_pc_pose(l2g_obs_l,l2g_miss_l,T_wl);
         globalmap_publisher->pub_globalmap(global_map->visualization_cell_list,stamp);
+        occupancy_grid_publisher->pub_occupancy_grid_2D_from_globalmap(*global_map,stamp);
     }
 
     virtual void onInit()
@@ -59,6 +60,8 @@ private:
                              measure_cnt,occupied_sh,free_sh);
         double max_z=min_z+(d_z*n_z);
         globalmap_publisher =  new rviz_vis(nh,"/globalmap","map",2,min_z,max_z,d_x,d_z);
+        occupancy_grid_publisher = new Global2OccupancyGrid2D(nh,"/occupancygrid",2);
+        occupancy_grid_publisher->setGlobalMap(*global_map,"map");
         sub_from_local = nh.subscribe<ccmapping::local2global>(
                     "/local2global",
                     10,

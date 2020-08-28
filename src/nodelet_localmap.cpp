@@ -152,8 +152,8 @@ private:
                                 const geometry_msgs::PoseStamped::ConstPtr & pose_Ptr)
     {
         tic_toc_ros update_time;
-        static int i=0;
-        //cout << "in the callback " << i++ << endl;
+//        static int i=0;
+//        cout << "in the localmap callback " << i++ << endl;
 
         SE3 T_wb(SO3(Quaterniond(pose_Ptr->pose.orientation.w,
                                  pose_Ptr->pose.orientation.x,
@@ -190,19 +190,38 @@ private:
             vector<int> index;
             pcl::removeNaNFromPointCloud(*cloud,*cloud,index);
         }
+
         int pcsize = static_cast<int>(cloud->size());
         vector<Vec3> pc_eigen;
-        for(int i=0; i<1000; i++)
+        if(pcsize>1000)
         {
-            size_t rand_idx = static_cast<size_t>(rand() % pcsize);
-            PointP pt = cloud->at(rand_idx);
-            pc_eigen.push_back(Vec3(static_cast<double>(pt.x),
-                                    static_cast<double>(pt.y),
-                                    static_cast<double>(pt.z)));
+            for(int i=0; i<1000; i++)
+            {
+                size_t rand_idx = static_cast<size_t>(rand() % pcsize);
+                PointP pt = cloud->at(rand_idx);
+                pc_eigen.push_back(Vec3(static_cast<double>(pt.x),
+                                        static_cast<double>(pt.y),
+                                        static_cast<double>(pt.z)));
+            }
         }
+        else
+        {
+            for(int i=0; i<pcsize; i++)
+            {
+                PointP pt = cloud->at(i);
+                pc_eigen.push_back(Vec3(static_cast<double>(pt.x),
+                                        static_cast<double>(pt.y),
+                                        static_cast<double>(pt.z)));
+            }
+        }
+
+
         local_map->input_pc_pose(pc_eigen,T_wb);
+        //cout << "publish local map" << endl;
         this->localmap_publisher->pub_localmap(local_map->visualization_cell_list,pose_Ptr->header.stamp);
+        //cout << "publish local2global" << endl;
         l2g_pub->pub(local_map->l2g_msg_T_wl,local_map->l2g_msg_obs_pts_l,local_map->l2g_msg_miss_pts_l,pose_Ptr->header.stamp);
+        //cout << "publish local2global end" << endl;
         //update_time.toc("update time");
         //local_map
     }

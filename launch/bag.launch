@@ -2,7 +2,7 @@
     <param name ="/use_sim_time" value="true"/>
     <!--sim_planner1-->
 <!--Input######################################################################################################-->
-    <node pkg="rosbag" type="play" name="rosbag" args="$(find ccmapping)/bag/sim_planner4.bag --clock"
+    <node pkg="rosbag" type="play" name="rosbag" args="$(find ccmapping)/bag/sim_planner4.bag -r2 --clock"
         launch-prefix="bash -c 'sleep 2; $0 $@' ">
     </node>
 
@@ -16,7 +16,7 @@
     <!-- Manager -->
     <node pkg="nodelet" type="nodelet"
           name="ccmapping_nodelet_manager" args="manager" output="screen">
-          <param name="num_worker_threads" value="4" />
+          <param name="num_worker_threads" value="2" />
     </node>
 
     <node pkg="nodelet" type="nodelet" args="load ccmapping/LocalMapNodeletClass ccmapping_nodelet_manager"
