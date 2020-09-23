@@ -2,13 +2,13 @@
 #include <nodelet/nodelet.h>
 #include <utils/include/all_utils.h>
 #include <ros/ros.h>
-#include <ccmapping/local2global.h>
+#include <glmapping/local2global.h>
 #include <global_map_cartesian.h>
 #include <msg_local2global.h>
 #include <rviz_vis.h>
 #include <global2occupancygrid2d.h>
 
-namespace ccmapping_ns
+namespace glmapping_ns
 {
 
 class GlobalMapNodeletClass : public nodelet::Nodelet
@@ -23,7 +23,7 @@ private:
     rviz_vis *globalmap_publisher;
     Global2OccupancyGrid2D *occupancy_grid_publisher;
 
-    void from_lm_callback(const ccmapping::local2globalConstPtr& msg)
+    void from_lm_callback(const glmapping::local2globalConstPtr& msg)
     {
         SE3 T_wl;
         vector<Vec3> l2g_obs_l;
@@ -40,19 +40,19 @@ private:
         cout << "globalmapnode:" << endl;
         ros::NodeHandle& nh = getMTPrivateNodeHandle();
         string configFilePath;
-        cout << "this is ccmapping global node" << endl;
-        nh.getParam("/ccmapping_configfile",   configFilePath);
+        cout << "this is glmapping global node" << endl;
+        nh.getParam("/glmapping_configfile",   configFilePath);
         cout << "read the config file" << endl;
-        double d_x  = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_d_x");
-        double d_y  = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_d_y");
-        double d_z  = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_d_z");
-        int    n_x  = getIntVariableFromYaml(configFilePath,"ccmapping_gm_n_x");
-        int    n_y  = getIntVariableFromYaml(configFilePath,"ccmapping_gm_n_y");
-        int    n_z  = getIntVariableFromYaml(configFilePath,"ccmapping_gm_n_z");
-        double min_z       = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_min_z");
-        int    measure_cnt = getIntVariableFromYaml(configFilePath,"ccmapping_gm_measurement_cnt");
-        double occupied_sh = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_occupied_p_sh");
-        double free_sh     = getDoubleVariableFromYaml(configFilePath,"ccmapping_gm_free_p_sh");
+        double d_x  = getDoubleVariableFromYaml(configFilePath,"glmapping_gm_d_x");
+        double d_y  = getDoubleVariableFromYaml(configFilePath,"glmapping_gm_d_y");
+        double d_z  = getDoubleVariableFromYaml(configFilePath,"glmapping_gm_d_z");
+        int    n_x  = getIntVariableFromYaml(configFilePath,"glmapping_gm_n_x");
+        int    n_y  = getIntVariableFromYaml(configFilePath,"glmapping_gm_n_y");
+        int    n_z  = getIntVariableFromYaml(configFilePath,"glmapping_gm_n_z");
+        double min_z       = getDoubleVariableFromYaml(configFilePath,"glmapping_gm_min_z");
+        int    measure_cnt = getIntVariableFromYaml(configFilePath,"glmapping_gm_measurement_cnt");
+        double occupied_sh = getDoubleVariableFromYaml(configFilePath,"glmapping_gm_occupied_p_sh");
+        double free_sh     = getDoubleVariableFromYaml(configFilePath,"glmapping_gm_free_p_sh");
 
 
         global_map = new global_map_cartesian();
@@ -62,7 +62,7 @@ private:
         globalmap_publisher =  new rviz_vis(nh,"/globalmap","map",2,min_z,max_z,d_x,d_z);
         occupancy_grid_publisher = new Global2OccupancyGrid2D(nh,"/occupancygrid",2);
         occupancy_grid_publisher->setGlobalMap(*global_map,"map");
-        sub_from_local = nh.subscribe<ccmapping::local2global>(
+        sub_from_local = nh.subscribe<glmapping::local2global>(
                     "/local2global",
                     10,
                     boost::bind(&GlobalMapNodeletClass::from_lm_callback, this, _1));
@@ -72,8 +72,8 @@ private:
     }
 
 };//class GlobalMapNodeletClass
-}//namespace ccmapping_ns
+}//namespace glmapping_ns
 
-PLUGINLIB_EXPORT_CLASS(ccmapping_ns::GlobalMapNodeletClass, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(glmapping_ns::GlobalMapNodeletClass, nodelet::Nodelet)
 
 

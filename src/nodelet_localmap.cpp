@@ -18,7 +18,7 @@
 #include <rviz_vis.h>
 #include <msg_local2global.h>
 
-namespace ccmapping_ns
+namespace glmapping_ns
 {
 
 using namespace std;
@@ -59,15 +59,15 @@ private:
         cout << "localmapnode:" << endl;
         ros::NodeHandle& nh = getMTPrivateNodeHandle();
         string configFilePath;
-        nh.getParam("/ccmapping_configfile",   configFilePath);
+        nh.getParam("/glmapping_configfile",   configFilePath);
         cout << "read the config file" << endl;
 
-        double d_Rho          = getDoubleVariableFromYaml(configFilePath,"ccmapping_lm_d_Rho");
-        double d_Phi_deg      = getDoubleVariableFromYaml(configFilePath,"ccmapping_lm_d_Phi_deg");
-        double d_Z            = getDoubleVariableFromYaml(configFilePath,"ccmapping_lm_d_Z");
-        int    n_Rho          = getIntVariableFromYaml(configFilePath,"ccmapping_lm_n_Rho");
-        int    n_Z_below      = getIntVariableFromYaml(configFilePath,"ccmapping_lm_n_Z_below");
-        int    n_Z_over       = getIntVariableFromYaml(configFilePath,"ccmapping_lm_n_Z_over");
+        double d_Rho          = getDoubleVariableFromYaml(configFilePath,"glmapping_lm_d_Rho");
+        double d_Phi_deg      = getDoubleVariableFromYaml(configFilePath,"glmapping_lm_d_Phi_deg");
+        double d_Z            = getDoubleVariableFromYaml(configFilePath,"glmapping_lm_d_Z");
+        int    n_Rho          = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Rho");
+        int    n_Z_below      = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Z_below");
+        int    n_Z_over       = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Z_over");
         Mat4x4  T_bs_mat      = Mat44FromYaml(configFilePath,"T_B_S");
         bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
         publish_T_wb          = getBoolVariableFromYaml(configFilePath,"publish_T_wb");
@@ -115,16 +115,16 @@ private:
 
         if(use_exactsync)
         {
-            pc_sub.subscribe(nh,   "/ccmapping/pc", 10);
-            pose_sub.subscribe(nh, "/ccmapping/pose", 10);
+            pc_sub.subscribe(nh,   "/glmapping/pc", 10);
+            pose_sub.subscribe(nh, "/glmapping/pose", 10);
             exactSync_ = new message_filters::Synchronizer<ExactSyncPolicy>(ExactSyncPolicy(5), pc_sub, pose_sub);
             exactSync_->registerCallback(boost::bind(&LocalMapNodeletClass::pc_pose_input_callback, this, _1, _2));
             cout << "ExactSyncPolicy" << endl;
         }
         else
         {
-            pc_sub.subscribe(nh,   "/ccmapping/pc", 1);
-            pose_sub.subscribe(nh, "/ccmapping/pose", 1);
+            pc_sub.subscribe(nh,   "/glmapping/pc", 1);
+            pose_sub.subscribe(nh, "/glmapping/pose", 1);
             approxSync_ = new message_filters::Synchronizer<ApproxSyncPolicy>(ApproxSyncPolicy(100), pc_sub, pose_sub);
             approxSync_->registerCallback(boost::bind(&LocalMapNodeletClass::pc_pose_input_callback, this, _1, _2));
             cout << "ApproxSyncPolicy" << endl;
@@ -228,8 +228,8 @@ private:
 
 
 };//class LocalMapNodeletClass
-}//namespace ccmapping_ns
+}//namespace glmapping_ns
 
-PLUGINLIB_EXPORT_CLASS(ccmapping_ns::LocalMapNodeletClass, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(glmapping_ns::LocalMapNodeletClass, nodelet::Nodelet)
 
 

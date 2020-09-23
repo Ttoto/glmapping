@@ -3,7 +3,7 @@
 
 #include <utils/include/all_utils.h>
 #include <cylindrical_cell.h>
-#include <ccmapping/local2global.h>
+#include <glmapping/local2global.h>
 
 class local_map_cylindrical
 {

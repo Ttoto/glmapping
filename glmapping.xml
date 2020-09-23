@@ -1,13 +1,13 @@
-<library path="lib/libccmapping">
+<library path="lib/libglmapping">
 
-        <class name="ccmapping/LocalMapNodeletClass" type="ccmapping_ns::LocalMapNodeletClass"
+        <class name="glmapping/LocalMapNodeletClass" type="glmapping_ns::LocalMapNodeletClass"
 		base_class_type="nodelet::Nodelet">
 		<description>
                         LocalMapNodeletClass
 		</description>
 	</class>
 
-        <class name="ccmapping/GlobalMapNodeletClass" type="ccmapping_ns::GlobalMapNodeletClass"
+        <class name="glmapping/GlobalMapNodeletClass" type="glmapping_ns::GlobalMapNodeletClass"
 		base_class_type="nodelet::Nodelet">
 		<description>
                         GlobalMapNodeletClass

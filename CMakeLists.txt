@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ccmapping)
+project(glmapping)
 
 set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS} -O3 -Wall -pthread") # -Wextra -Werror
 set(CMAKE_BUILD_TYPE "RELEASE")
@@ -52,7 +52,7 @@ include_directories(SYSTEM
     )
 
 ## Declare a C++ library
-add_library(ccmapping
+add_library(glmapping
     src/nodelet_globalmap.cpp
     src/nodelet_localmap.cpp
     src/cylindrical_cell.cpp
@@ -64,11 +64,11 @@ add_library(ccmapping
     src/global2occupancygrid2d.cpp
     )
 
-add_dependencies(ccmapping
-    ccmapping_generate_messages_cpp
+add_dependencies(glmapping
+    glmapping_generate_messages_cpp
     ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(ccmapping
+target_link_libraries(glmapping
     ${catkin_LIBRARIES}
     ${CSPARSE_LIBRARY}
     ${Sophus_LIBRARIES}

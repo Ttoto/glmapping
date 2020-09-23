@@ -7,12 +7,12 @@ msg_local2global::msg_local2global()
 
 msg_local2global::msg_local2global(ros::NodeHandle& nh, string topic_name, int buffersize)
 {
-    l2g_pub = nh.advertise<ccmapping::local2global>(topic_name,buffersize);
+    l2g_pub = nh.advertise<glmapping::local2global>(topic_name,buffersize);
 }
 
 void msg_local2global::pub(const SE3 T_w_l, vector<Vec3> obs_pts, vector<Vec3> miss_pts, ros::Time stamp)
 {
-    ccmapping::local2global l2g_msg;
+    glmapping::local2global l2g_msg;
     l2g_msg.header.stamp = stamp;
     l2g_msg.pt_obs_count = obs_pts.size();
     l2g_msg.pt_miss_count = miss_pts.size();
@@ -44,7 +44,7 @@ void msg_local2global::pub(const SE3 T_w_l, vector<Vec3> obs_pts, vector<Vec3> m
     l2g_pub.publish(l2g_msg);
 }
 
-void msg_local2global::unpack(ccmapping::local2globalConstPtr ptr,
+void msg_local2global::unpack(glmapping::local2globalConstPtr ptr,
                               SE3 &T_w_l,
                               vector<Vec3> &l2g_obs_l,
                               vector<Vec3> &l2g_miss_l,
