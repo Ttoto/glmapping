@@ -157,16 +157,18 @@ void local_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
             map.at(this->mapIdx(rpz_idx)).sampled_xyz = p_l;
             if(visibility_check)
             {
+                float landing_rate = map.at(this->mapIdx(rpz_idx)).landing_rate_to_sensor;
                 for (int r=rpz_idx[0]-1; r>0 ; r--) {
-                    map.at(this->mapIdx(Vec3I(r,rpz_idx[1],rpz_idx[2]))).is_occupied = false;
-                    l2g_msg_miss_pts_l.push_back(map.at(this->mapIdx(Vec3I(r,rpz_idx[1],rpz_idx[2]))).vis_pt);
+                    int rpz_z = static_cast<int>(r*landing_rate);
+                    map.at(this->mapIdx(Vec3I(r,rpz_idx[1],rpz_z))).is_occupied = false;
+                    l2g_msg_miss_pts_l.push_back(map.at(this->mapIdx(Vec3I(r,rpz_idx[1],rpz_z))).vis_pt);
                 }
             }
         }else
         {
         }
     }
-    //Update occupied list;
+    //Update visualization list;
     visualization_cell_list.clear();
     for(auto cell:this->map)
     {
