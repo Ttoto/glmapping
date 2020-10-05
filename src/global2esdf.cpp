@@ -13,11 +13,13 @@ void Global2ESDF::setGlobalMap(global_map_cartesian &map, string world_fram_name
     this->map2d_dy = map.map_dy;
     this->map2mat_bias_x = (map2d_nx/2);
     this->map2mat_bias_y = (map2d_ny/2);
-    this->mat2map_bias_x = -map2mat_bias_x;
-    this->mat2map_bias_y = -map2mat_bias_y;
+    this->mat2vismap_bias_x = -(static_cast<double>(map2d_nx)/2.0)*map2d_dx+0.5*map2d_dx;
+    this->mat2vismap_bias_y = -(static_cast<double>(map2d_ny)/2.0)*map2d_dy+0.5*map2d_dy;
 
-    cout << "map2d_nx" << map2d_nx << "map2d_ny" << map2d_ny << endl;
-    cout << "map2mat_bias_x" << map2mat_bias_x << "map2mat_bias_y" << map2mat_bias_y << endl;
+    cout << "map2d_nx" << map2d_nx << endl << "map2d_ny" << map2d_ny << endl;
+    cout << "map2d_dx" << map2d_dx << endl << "map2d_dy" << map2d_dy << endl;
+    cout << "map2mat_bias_x" << map2mat_bias_x << endl << "map2mat_bias_y" << map2mat_bias_y << endl;
+    cout << "mat2vismap_bias_x" << mat2vismap_bias_x << endl << "mat2vismap_bias_x" << mat2vismap_bias_x << endl;
 
     cubes_array.header.frame_id  = world_fram_name;
     cubes_array.ns = "points";
@@ -63,10 +65,12 @@ void Global2ESDF::pub_ESDF_2D_from_globalmap(global_map_cartesian &map, ros::Tim
 {
     for(auto cell:map.occupied_cell_idx_list)
     {
-        int x = cell(0)+map2mat_bias_x;
-        int y = cell(1)+map2mat_bias_y;
+//        int x = cell(0)+map2mat_bias_x;
+//        int y = cell(1)+map2mat_bias_y;
+        int x = cell(0);
+        int y = cell(1);
         esdf_map(x,y) = ESDF_OCCUPIED;
-        cout << "add as cooupied" << endl;
+        //cout << "add as cooupied" << endl;
     }
     for (int x = 0; x < map2d_nx; x++)
     {
@@ -76,22 +80,22 @@ void Global2ESDF::pub_ESDF_2D_from_globalmap(global_map_cartesian &map, ros::Tim
             {
                 for(int xx=x-ESDF_SERCHRANGE; xx<x+(ESDF_SERCHRANGE+1); xx++)
                 {
-                    if(xx<0 || xx>(map2d_nx-1)) break;
                     for(int yy=y-ESDF_SERCHRANGE; yy<y+(ESDF_SERCHRANGE+1); yy++)
                     {
-                        if(yy<0 || yy>(map2d_ny-1))
-                        {
-                            break;
+                        if(yy<0 || yy>(map2d_ny-1) || xx<0 || xx>(map2d_nx-1))
+                        {//out of range
+                            //cout << "xx yy out of range" << endl;
+                            continue;
                         }
                         if(esdf_map(xx,yy)==ESDF_OCCUPIED)
                         {
-                            cout << "occupied " << endl;
-                            break;
+                            continue;
                         }
                         if(esdf_map(xx,yy)==ESDF_UNKNOWN)
                         {
+                            //cout << sqrt(pow((abs(xx-x)*map2d_dx),2)+pow((abs(yy-y)*map2d_dy),2)) << endl;;
                             esdf_map(xx,yy) = sqrt(pow((abs(xx-x)*map2d_dx),2)+pow((abs(yy-y)*map2d_dy),2));
-                            break;
+                            continue;
                         }
                         double dis=sqrt(pow((abs(xx-x)*map2d_dx),2)+pow((abs(yy-y)*map2d_dy),2));
                         if(esdf_map(xx,yy)>dis)
@@ -108,44 +112,54 @@ void Global2ESDF::pub_ESDF_2D_from_globalmap(global_map_cartesian &map, ros::Tim
     cubes_array.colors.clear();
     cubes_array.header.stamp = stamp;
 
-    double max_esdf_range=ESDF_SERCHRANGE*map2d_dx;
+    double max_esdf_range=ESDF_SERCHRANGE*map2d_dx*1.5;
     for (int x = 0; x < map2d_nx; x++)
     {
         for (int y = 0; y < map2d_ny; y++)
         {
             if(esdf_map(x,y) == ESDF_UNKNOWN)
             {//Unknown ->Nothing
-                break;
+                geometry_msgs::Point point;
+                point.x = mat2vismap_bias_x+x*this->map2d_dx;
+                point.y = mat2vismap_bias_y+y*this->map2d_dy;
+                point.z = 0.0;
+                this->cubes_array.points.push_back(point);
+                std_msgs::ColorRGBA color;
+                color.r= 0.0;
+                color.g= 0.8;
+                color.b= 0.0;
+                color.a= static_cast<float>(0.1);
+                this->cubes_array.colors.push_back(color);
+                continue;
             }
             if(esdf_map(x,y) == ESDF_OCCUPIED)
             {//Occupied ->BLACK
-                cout << "here" << endl;
                 geometry_msgs::Point point;
-                point.x = (x+this->mat2map_bias_x)*this->map2d_dx;
-                point.y = (y+this->mat2map_bias_y)*this->map2d_dy;
-                point.z = 0.1;
+                point.x = mat2vismap_bias_x+x*this->map2d_dx;
+                point.y = mat2vismap_bias_y+y*this->map2d_dy;
+                point.z = 0.0;
                 this->cubes_array.points.push_back(point);
                 std_msgs::ColorRGBA color;
                 color.r= 0.0;
                 color.g= 0.0;
                 color.b= 0.0;
-                color.a= static_cast<float>(0.2);
+                color.a= static_cast<float>(0.9);
                 this->cubes_array.colors.push_back(color);
             }else
             {//Color according to distance
-//                geometry_msgs::Point point;
-//                point.x = (x+this->mat2map_bias_x)*this->map2d_dx;
-//                point.y = (y+this->mat2map_bias_y)*this->map2d_dy;
-//                point.z = 0.1;
-//                this->cubes_array.points.push_back(point);
-//                double ratio = esdf_map(x,y)/max_esdf_range;
-//                Vec3 rgb = this->esdf_cube_coler(ratio);
-//                std_msgs::ColorRGBA color;
-//                color.r= static_cast<float>(rgb(0));
-//                color.g= static_cast<float>(rgb(1));
-//                color.b= static_cast<float>(rgb(2));
-//                color.a= static_cast<float>(0.2);
-//                this->cubes_array.colors.push_back(color);
+                geometry_msgs::Point point;
+                point.x = mat2vismap_bias_x+x*this->map2d_dx;
+                point.y = mat2vismap_bias_y+y*this->map2d_dy;
+                point.z = 0.0;
+                this->cubes_array.points.push_back(point);
+                double ratio = esdf_map(x,y)/max_esdf_range;
+                Vec3 rgb = this->esdf_cube_coler(ratio);
+                std_msgs::ColorRGBA color;
+                color.r= static_cast<float>(rgb(0));
+                color.g= static_cast<float>(rgb(1));
+                color.b= static_cast<float>(rgb(2));
+                color.a= static_cast<float>(0.9);
+                this->cubes_array.colors.push_back(color);
             }
         }
     }

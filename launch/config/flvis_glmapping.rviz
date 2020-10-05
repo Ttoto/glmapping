@@ -5,11 +5,16 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /Grid1
         - /TF1/Frames1
         - /TF1/Tree1
         - /GLMAPPING1
         - /GLMAPPING1/LocalMap1
         - /GLMAPPING1/GlobalMap1
+        - /GLMAPPING1/GlobalMap1/Status1
+        - /GLMAPPING1/esdf1
+        - /GLMAPPING1/esdf1/Status1
+        - /Axes1
       Splitter Ratio: 0.5230262875556946
     Tree Height: 449
   - Class: rviz/Selection
@@ -53,7 +58,7 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 100
+      Plane Cell Count: 40
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz/TF
@@ -147,7 +152,7 @@ Visualization Manager:
           Marker Topic: /localmap
           Name: LocalMap
           Namespaces:
-            {}
+            points: true
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
@@ -155,7 +160,15 @@ Visualization Manager:
           Marker Topic: /globalmap
           Name: GlobalMap
           Namespaces:
-            {}
+            points: true
+          Queue Size: 100
+          Value: true
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /esfd_map
+          Name: esdf
+          Namespaces:
+            points: true
           Queue Size: 100
           Value: true
         - Alpha: 0.699999988079071
@@ -170,6 +183,13 @@ Visualization Manager:
           Value: false
       Enabled: true
       Name: GLMAPPING
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 20
+      Name: Axes
+      Radius: 0.10000000149011612
+      Reference Frame: <Fixed Frame>
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 136; 138; 133
@@ -198,7 +218,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 129.75274658203125
+      Distance: 123.55655670166016
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -213,10 +233,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.14039818942546844
+      Pitch: 1.1903983354568481
       Target Frame: body_frame
       Value: XYOrbit (rviz)
-      Yaw: 4.113577842712402
+      Yaw: 5.018578052520752
     Saved: ~
 Window Geometry:
   Displays:

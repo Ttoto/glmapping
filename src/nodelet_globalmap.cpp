@@ -24,6 +24,7 @@ private:
     rviz_vis *globalmap_publisher;
     Global2OccupancyGrid2D *occupancy_grid_publisher;
     Global2ESDF *esfd_publisher;
+    ros::Time last_esft_stamp;
 
     void from_lm_callback(const glmapping::local2globalConstPtr& msg)
     {
@@ -35,7 +36,10 @@ private:
         global_map->input_pc_pose(l2g_obs_l,l2g_miss_l,T_wl);
         globalmap_publisher->pub_globalmap(global_map->visualization_cell_list,stamp);
         occupancy_grid_publisher->pub_occupancy_grid_2D_from_globalmap(*global_map,stamp);
-        //esfd_publisher->pub_ESDF_2D_from_globalmap(*global_map,stamp);
+        if((ros::Time::now().toSec()-last_esft_stamp.toSec())>0.19)
+        {
+            esfd_publisher->pub_ESDF_2D_from_globalmap(*global_map,stamp);
+        }
     }
 
     virtual void onInit()
@@ -67,12 +71,11 @@ private:
         occupancy_grid_publisher->setGlobalMap(*global_map,"map");
         esfd_publisher = new Global2ESDF(nh,"/esfd_map",2);
         esfd_publisher->setGlobalMap(*global_map,"map");
+        last_esft_stamp = ros::Time::now();
         sub_from_local = nh.subscribe<glmapping::local2global>(
                     "/local2global",
                     10,
                     boost::bind(&GlobalMapNodeletClass::from_lm_callback, this, _1));
-
-
         
     }
 

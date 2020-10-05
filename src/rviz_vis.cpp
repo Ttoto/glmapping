@@ -105,10 +105,13 @@ void rviz_vis::pub_localmap(const vector<Vec3> &pts3d, const ros::Time stamp)
         color.r= static_cast<float>(rgb(0));
         color.g= static_cast<float>(rgb(1));
         color.b= static_cast<float>(rgb(2));
-        color.a= static_cast<float>(0.8);
+        color.a= static_cast<float>(0.9);
         spheres.colors.push_back(color);
     }
-    this->map_pub.publish(spheres);
+    if(spheres.points.size()!=0)
+    {
+        this->map_pub.publish(spheres);
+    }
 }
 
 void rviz_vis::pub_globalmap(const vector<Vec3> &pts3d, const ros::Time stamp)
@@ -135,8 +138,11 @@ void rviz_vis::pub_globalmap(const vector<Vec3> &pts3d, const ros::Time stamp)
         color.r= static_cast<float>(rgb(0));
         color.g= static_cast<float>(rgb(1));
         color.b= static_cast<float>(rgb(2));
-        color.a= static_cast<float>(0.2);
+        color.a= static_cast<float>(0.5);
         cubes.colors.push_back(color);
     }
-    this->map_pub.publish(cubes);
+    if(cubes.points.size()!=0)
+    {
+        this->map_pub.publish(cubes);
+    }
 }
