@@ -12,7 +12,7 @@
 
 #define ESDF_OCCUPIED (-1.0)
 #define ESDF_UNKNOWN  (-2.0)
-#define ESDF_SERCHRANGE (10)
+#define ESDF_SERCHRANGE (15)
 typedef Matrix<double, Dynamic, Dynamic> MatrixXd;
 
 class Global2ESDF

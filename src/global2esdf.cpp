@@ -122,7 +122,7 @@ void Global2ESDF::pub_ESDF_2D_from_globalmap(global_map_cartesian &map, ros::Tim
                 geometry_msgs::Point point;
                 point.x = mat2vismap_bias_x+x*this->map2d_dx;
                 point.y = mat2vismap_bias_y+y*this->map2d_dy;
-                point.z = 0.0;
+                point.z = -0.1;
                 this->cubes_array.points.push_back(point);
                 std_msgs::ColorRGBA color;
                 color.r= 0.0;
@@ -137,7 +137,7 @@ void Global2ESDF::pub_ESDF_2D_from_globalmap(global_map_cartesian &map, ros::Tim
                 geometry_msgs::Point point;
                 point.x = mat2vismap_bias_x+x*this->map2d_dx;
                 point.y = mat2vismap_bias_y+y*this->map2d_dy;
-                point.z = 0.0;
+                point.z = -0.1;
                 this->cubes_array.points.push_back(point);
                 std_msgs::ColorRGBA color;
                 color.r= 0.0;
@@ -150,7 +150,7 @@ void Global2ESDF::pub_ESDF_2D_from_globalmap(global_map_cartesian &map, ros::Tim
                 geometry_msgs::Point point;
                 point.x = mat2vismap_bias_x+x*this->map2d_dx;
                 point.y = mat2vismap_bias_y+y*this->map2d_dy;
-                point.z = 0.0;
+                point.z = -0.1;
                 this->cubes_array.points.push_back(point);
                 double ratio = esdf_map(x,y)/max_esdf_range;
                 Vec3 rgb = this->esdf_cube_coler(ratio);

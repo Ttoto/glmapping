@@ -91,7 +91,7 @@ void rviz_vis::pub_localmap(const vector<Vec3> &pts3d, const ros::Time stamp)
     spheres.type = visualization_msgs::Marker::SPHERE_LIST;
     spheres.action = visualization_msgs::Marker::ADD;
     spheres.pose.orientation.w =  1.0;
-    spheres.scale.x = spheres.scale.y = spheres.scale.z = 0.2;
+    spheres.scale.x = spheres.scale.y = spheres.scale.z = 0.4;
     spheres.id = 0;
     for (auto pt:pts3d) {
         geometry_msgs::Point point;
@@ -99,13 +99,17 @@ void rviz_vis::pub_localmap(const vector<Vec3> &pts3d, const ros::Time stamp)
         point.y = pt.y();
         point.z = pt.z();
         spheres.points.push_back(point);
-        double ratio = (pt.z()-min_z)/range_z;
-        Vec3 rgb = sphereColer(ratio);
         std_msgs::ColorRGBA color;
-        color.r= static_cast<float>(rgb(0));
-        color.g= static_cast<float>(rgb(1));
-        color.b= static_cast<float>(rgb(2));
-        color.a= static_cast<float>(0.9);
+//        double ratio = (pt.z()-min_z)/range_z;
+//        Vec3 rgb = sphereColer(ratio);
+//        color.r= static_cast<float>(rgb(0));
+//        color.g= static_cast<float>(rgb(1));
+//        color.b= static_cast<float>(rgb(2));
+//        color.a= static_cast<float>(0.9);
+        color.r= static_cast<float>(1.0);
+        color.g= static_cast<float>(1.0);
+        color.b= static_cast<float>(1.0);
+        color.a= static_cast<float>(1.0);
         spheres.colors.push_back(color);
     }
     if(spheres.points.size()!=0)
