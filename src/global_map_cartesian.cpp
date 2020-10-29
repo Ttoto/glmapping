@@ -96,24 +96,24 @@ void global_map_cartesian::creat_map(void)
     cout << map.size() << endl;
 }
 
-Vec3I global_map_cartesian::xyz2xyzIdx(Vec3 xyz_l)
+Vec3I global_map_cartesian::xyz2xyzIdx(Vec3 xyz_w)
 {
-    double x = xyz_l(0)-this->map_min_x;
+    double x = xyz_w(0)-this->map_min_x;
     int x_idx =  static_cast<int>(x/this->map_dx);
-    double y = xyz_l(1)-this->map_min_y;
+    double y = xyz_w(1)-this->map_min_y;
     int y_idx =  static_cast<int>(y/this->map_dy);
-    double z = xyz_l(2)-this->map_min_z;
+    double z = xyz_w(2)-this->map_min_z;
     int z_idx =  static_cast<int>(z/this->map_dz);
     return Vec3I(x_idx,y_idx,z_idx);
 }
 
-bool global_map_cartesian::xyz2xyzIdxwithBoderCheck(Vec3 xyz_l, Vec3I &xyz_idx)
+bool global_map_cartesian::xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx)
 {
-    double x = xyz_l(0)-this->map_min_x;
+    double x = xyz_w(0)-this->map_min_x;
     int x_idx =  static_cast<int>(x/this->map_dx);
-    double y = xyz_l(1)-this->map_min_y;
+    double y = xyz_w(1)-this->map_min_y;
     int y_idx =  static_cast<int>(y/this->map_dy);
-    double z = xyz_l(2)-this->map_min_z;
+    double z = xyz_w(2)-this->map_min_z;
     int z_idx =  static_cast<int>(z/this->map_dz);
     if(x>0 && y>0 && z>0)
     {
@@ -192,7 +192,7 @@ void global_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss
             visualization_cell_list.push_back(cell.vis_pt);
         }
     }
-    this->last_T_wl = T_wl;
+    this->newest_T_wl = T_wl;
     //cout << "globalmap vis size" << visualization_cell_list.size() << endl;
 
 }
