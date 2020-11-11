@@ -1,6 +1,8 @@
 #ifndef CC_RVIZ_VIS_H
 #define RVIZ_VIS_H
 #include <ros/ros.h>
+#include <local_map_cylindrical.h>
+#include <global_map_cartesian.h>
 #include <utils/include/all_utils.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -21,7 +23,7 @@ public:
     double cube_size_z;
 
     //for localmap
-    rviz_vis(ros::NodeHandle& nh,
+    void set_as_localmap_publisher(ros::NodeHandle& nh,
                 string topic_name,
                 string frame_id,
                 unsigned int buffer_size,
@@ -29,7 +31,7 @@ public:
                 double maxz);
 
     //for globalmap
-    rviz_vis(ros::NodeHandle& nh,
+    void set_as_globalmap_publisher(ros::NodeHandle& nh,
                 string topic_name,
                 string frame_id,
                 unsigned int buffer_size,
@@ -38,7 +40,7 @@ public:
                 double gm_cube_size_xy,
                 double gm_cube_size_z);
 
-    void pub_localmap(const vector<Vec3>& pts3d,
+    void pub_localmap(local_map_cylindrical* localmap,
                       const ros::Time stamp);
 
     void pub_globalmap(const vector<Vec3>& pts3d,

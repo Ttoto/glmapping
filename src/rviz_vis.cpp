@@ -1,16 +1,17 @@
 #include "rviz_vis.h"
-#include "local_map_cylindrical.h"
+
 
 rviz_vis::rviz_vis()
 {
 
 }
+
 rviz_vis::~rviz_vis()
 {
 
 }
 
-rviz_vis::rviz_vis(ros::NodeHandle& nh,
+void rviz_vis::set_as_localmap_publisher(ros::NodeHandle& nh,
                          string topic_name,
                          string frame_id,
                          unsigned int buffer_size,
@@ -24,7 +25,7 @@ rviz_vis::rviz_vis(ros::NodeHandle& nh,
     this->range_z = max_z-min_z;
 }
 
-rviz_vis::rviz_vis(ros::NodeHandle& nh,
+void rviz_vis::set_as_globalmap_publisher(ros::NodeHandle& nh,
                    string topic_name,
                    string frame_id,
                    unsigned int buffer_size,
@@ -82,7 +83,7 @@ Vec3 cubeColer(double ratio)
     return Vec3(red/260.0,grn/260.0,blu/260.0);
 }
 
-void rviz_vis::pub_localmap(const vector<Vec3> &pts3d, const ros::Time stamp)
+void rviz_vis::pub_localmap(local_map_cylindrical* localmap, const ros::Time stamp)
 {
     visualization_msgs::Marker spheres;
     spheres.header.frame_id  = this->localmap_frame_id;
@@ -93,8 +94,9 @@ void rviz_vis::pub_localmap(const vector<Vec3> &pts3d, const ros::Time stamp)
     spheres.pose.orientation.w =  1.0;
     spheres.scale.x = spheres.scale.y = spheres.scale.z = 0.4;
     spheres.id = 0;
-    for (auto pt:pts3d) {
+    for (auto i:localmap->occupied_cell_idx) {
         geometry_msgs::Point point;
+        Vec3 pt = localmap->map->at(i).center_pt;
         point.x = pt.x();
         point.y = pt.y();
         point.z = pt.z();

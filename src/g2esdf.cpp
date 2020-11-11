@@ -1,4 +1,4 @@
-#include "global2esdf.h"
+#include "g2esdfs.h"
 
 Global2ESDF::Global2ESDF(ros::NodeHandle& nh, string topic_name, int buffersize)
 {

@@ -1,39 +1,44 @@
 
-
 ##glmapping parameter
 #Localmap radius d_Rho*n_Rho
 #devition of orientation 360/d_Phi_deg
-#Number of grid n_Rho*(360/d_Phi)*(nz_below+nz_over)
-glmapping_lm_d_Rho:     0.1
-glmapping_lm_d_Phi_deg:   3
-glmapping_lm_d_Z:      0.15
-glmapping_lm_n_Rho:      40
-glmapping_lm_n_Z_below:  15
-glmapping_lm_n_Z_over:   15
+#n_Z = Z_below + Z_over + 1;
+#Number of grid n_Rho*(360/d_Phi)*(nz_below+nz_over+1)
+
+glmapping_lm_d_Rho:         0.1
+glmapping_lm_d_Phi_deg:       3
+glmapping_lm_d_Z:           0.1
+glmapping_lm_n_Rho:          30
+glmapping_lm_n_Z_below:      25
+glmapping_lm_n_Z_over:       25
 
 #Golbalmap papameter
-glmapping_gm_d_x:             0.2
-glmapping_gm_n_x:             200
-glmapping_gm_d_z:             0.2
-glmapping_gm_n_z:             200
-glmapping_gm_d_z:             0.2
-glmapping_gm_n_z:              10
-glmapping_gm_min_z:          -1.0
-glmapping_gm_measurement_cnt:  20
-glmapping_gm_occupied_p_sh:  0.95
-glmapping_gm_free_p_sh:       0.2
+glmapping_gm_d_xyz:           0.1
+#n_xy/n_z available value     3x(2n+1)  3x(odd number)  E.g 27 45 75 81 135 165 243 ...
+glmapping_gm_n_xy:            75
+glmapping_gm_n_z:             45
 
 
-use_exactsync:    false
+glmapping_gm_log_odds_min:      -2.0
+glmapping_gm_log_odds_max:       4.0
+glmapping_gm_measurement_hit:    0.7
+glmapping_gm_measurement_miss:  -0.4
+glmapping_gm_occupied_sh:        2.2
+
+
+
+use_exactsync:     false
+glmapping_use_raycasting:   true
+glmapping_sample_cnt:       200
 
 publish_T_wb:      true
-world_frame_id:    "world"
+world_frame_id:    "map"
 body_frame_id:     "body_frame"
 
 publish_T_bs:      true
 ##transformation from sensor frame to body frame
 T_B_S:
-[  0.0,   0.0,  1.0,  0.0,
+[  0.0,   0.0,  1.0,  0.12,
   -1.0,   0.0,  0.0,  0.0,
    0.0,  -1.0,  0.0,  0.0,
    0.0,   0.0,  0.0,  1.0]

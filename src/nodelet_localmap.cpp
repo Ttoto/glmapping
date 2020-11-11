@@ -17,6 +17,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <rviz_vis.h>
 #include <msg_local2global.h>
+#include <msg_localmap.h>
 
 namespace glmapping_ns
 {
@@ -37,9 +38,13 @@ private:
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, geometry_msgs::PoseStamped> ApproxSyncPolicy;
     message_filters::Synchronizer<ApproxSyncPolicy> * approxSync_;
 
-    msg_local2global*      l2g_pub;
+    msg_local2global* l2g_pub;
+    msg_localmap*     locamap_pub;
+
     local_map_cylindrical* local_map;
     bool enable_downsample;
+    int  pc_sample_cnt;
+    bool raycasting_flag;
     int  downsample_size;
     bool   publish_T_wb;
     bool   publish_T_bs;
@@ -52,7 +57,7 @@ private:
     geometry_msgs::TransformStamped transformStamped_T_wb;
     geometry_msgs::TransformStamped transformStamped_T_wl;
     geometry_msgs::TransformStamped transformStamped_T_bs;
-    rviz_vis *localmap_publisher;
+
 
     virtual void onInit()
     {
@@ -70,6 +75,8 @@ private:
         int    n_Z_over       = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Z_over");
         Mat4x4  T_bs_mat      = Mat44FromYaml(configFilePath,"T_B_S");
         bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
+        pc_sample_cnt         = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Rho");
+        raycasting_flag       = getBoolVariableFromYaml(configFilePath,"glmapping_use_raycasting");
         publish_T_wb          = getBoolVariableFromYaml(configFilePath,"publish_T_wb");
         publish_T_bs          = getBoolVariableFromYaml(configFilePath,"publish_T_bs");
         frame_id              = getStringFromYaml(configFilePath,"world_frame_id");
@@ -78,8 +85,8 @@ private:
         local_frame_id        = getStringFromYaml(configFilePath,"localmap_frame_id");
         T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
                    T_bs_mat.topRightCorner(3,1));
-        localmap_publisher =  new rviz_vis(nh,"/localmap",local_frame_id,3,-n_Z_below*d_Z,n_Z_over*d_Z);
-        l2g_pub =  new msg_local2global(nh,"/local2global",2);
+        locamap_pub = new msg_localmap(nh,"/glmapping_localmap");
+        l2g_pub     = new msg_local2global(nh,"/local2global",2);
 
         transformStamped_T_wb.header.frame_id = frame_id;
         transformStamped_T_wb.child_frame_id  = body_frame_id;
@@ -109,7 +116,7 @@ private:
         //init map
         local_map = new local_map_cylindrical();
         local_map->setTbs(T_bs);
-        local_map->init_map(d_Rho,d_Phi_deg,d_Z,n_Rho,n_Z_below,n_Z_over);
+        local_map->init_map(d_Rho,d_Phi_deg,d_Z,n_Rho,n_Z_below,n_Z_over,raycasting_flag);
 
         //init the local map
 
@@ -151,9 +158,7 @@ private:
     void pc_pose_input_callback(const sensor_msgs::PointCloud2::ConstPtr & pc_Ptr,
                                 const geometry_msgs::PoseStamped::ConstPtr & pose_Ptr)
     {
-        tic_toc_ros update_time;
-//        static int i=0;
-//        cout << "in the localmap callback " << i++ << endl;
+        //tic_toc_ros update_time;
 
         SE3 T_wb(SO3(Quaterniond(pose_Ptr->pose.orientation.w,
                                  pose_Ptr->pose.orientation.x,
@@ -193,9 +198,9 @@ private:
 
         int pcsize = static_cast<int>(cloud->size());
         vector<Vec3> pc_eigen;
-        if(pcsize>1000)
+        if(pcsize>pc_sample_cnt)
         {
-            for(int i=0; i<1000; i++)
+            for(int i=0; i<pc_sample_cnt; i++)
             {
                 size_t rand_idx = static_cast<size_t>(rand() % pcsize);
                 PointP pt = cloud->at(rand_idx);
@@ -215,14 +220,15 @@ private:
             }
         }
 
-
         local_map->input_pc_pose(pc_eigen,T_wb);
-        //cout << "publish local map" << endl;
-        this->localmap_publisher->pub_localmap(local_map->visualization_cell_list,pose_Ptr->header.stamp);
-        //cout << "publish local2global" << endl;
-        l2g_pub->pub(local_map->l2g_msg_T_wl,local_map->l2g_msg_obs_pts_l,local_map->l2g_msg_miss_pts_l,pose_Ptr->header.stamp);
-        //cout << "publish local2global end" << endl;
-        //update_time.toc("update time");
+        locamap_pub->pub(local_map,pose_Ptr->header.stamp);
+        //this->localmap_publisher->pub_localmap(local_map->visualization_cell_list,pose_Ptr->header.stamp);
+        l2g_pub->pub(local_map->T_wl,
+                     local_map->l2g_msg_hit_pts_l,
+                     local_map->l2g_msg_miss_pts_l,
+                     pose_Ptr->header.stamp);
+
+        //update_time.toc("local map update time");
         //local_map
     }
 

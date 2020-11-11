@@ -2,7 +2,7 @@
 #define GLOBAL_MAP_CARTESIAN_H
 
 #include <utils/include/all_utils.h>
-#include <cartesian_cell.h>
+#include <cell_global_cartesian.h>
 
 class global_map_cartesian
 {
@@ -32,7 +32,7 @@ public:
 
     vector<Vec3> visualization_cell_list;
     vector<Vec3I> occupied_cell_idx_list;
-    vector<cartesian_cell> map;
+    vector<CARTESIAN_CELL> map;
     SE3 newest_T_wl;
     bool first_input;
     size_t mapIdx(Vec3I xyz_idx);

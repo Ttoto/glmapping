@@ -54,7 +54,7 @@ void global_map_cartesian::init_map(double d_x, double d_y, double d_z,
     cout  << "map_ny"  <<  map_ny  <<endl;
     cout  << "map_nz"  <<  map_nz  <<endl;
     cout  << "min_z" <<  min_z << endl;
-    this->creat_map();
+    //this->creat_map();
     first_input = true;
     visibility_check = true;
     this->measurement_cnt_max = measurement_volume/2;
@@ -86,10 +86,12 @@ void global_map_cartesian::creat_map(void)
         {
             for (int x=0; x<this->map_nx; x++)
             {
+                CARTESIAN_CELL cell;
                 double vis_x = this->map_min_x+(this->map_dx/2)+(x*this->map_dx);
                 double vis_y = this->map_min_y+(this->map_dy/2)+(y*this->map_dy);
                 double vis_z = this->map_min_z+(this->map_dz/2)+(z*this->map_dz);
-                this->map.push_back(cartesian_cell(x,y,z,Vec3(vis_x,vis_y,vis_z)));
+
+                this->map.push_back(cell);
             }
         }
     }
@@ -148,15 +150,15 @@ void global_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss
         if(xyz2xyzIdxwithBoderCheck(p_w,xyz_idx))
         {
             size_t map_idx=mapIdx(xyz_idx);
-            map.at(map_idx).measurement_times++;
-            if(map.at(map_idx).measurement_times > this->measurement_cnt_max)
+            map.at(map_idx).log_odds++;
+            if(map.at(map_idx).log_odds > this->measurement_cnt_max)
             {
-                map.at(map_idx).measurement_times=measurement_cnt_max;
+                map.at(map_idx).log_odds=measurement_cnt_max;
             }
             //set observerable
-            if(map.at(map_idx).measurement_times>this->occupied_measurement_cnt){
+            if(map.at(map_idx).log_odds>this->occupied_measurement_cnt){
                 map.at(this->mapIdx(xyz_idx)).is_occupied = true;
-                map.at(this->mapIdx(xyz_idx)).sampled_xyz = p_w;
+                //map.at(this->mapIdx(xyz_idx)).sampled_xyz = p_w;
             }
         }else
         {
@@ -168,13 +170,13 @@ void global_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss
         if(xyz2xyzIdxwithBoderCheck(p_miss_w,xyz_idx))
         {
             size_t map_idx=mapIdx(xyz_idx);
-            map.at(map_idx).measurement_times--;
-            if(map.at(map_idx).measurement_times < this->measurement_cnt_min)
+            map.at(map_idx).log_odds--;
+            if(map.at(map_idx).log_odds < this->measurement_cnt_min)
             {
-                map.at(map_idx).measurement_times=measurement_cnt_min;
+                map.at(map_idx).log_odds=measurement_cnt_min;
             }
             //set free
-            if(map.at(map_idx).measurement_times < this->free_measurement_cnt){
+            if(map.at(map_idx).log_odds < this->free_measurement_cnt){
                 map.at(this->mapIdx(xyz_idx)).is_occupied = false;
             }
         }else
@@ -189,7 +191,7 @@ void global_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss
         if(cell.is_occupied)
         {
             occupied_cell_idx_list.push_back(Vec3I(cell.idx_x,cell.idx_y,cell.idx_z));
-            visualization_cell_list.push_back(cell.vis_pt);
+            //visualization_cell_list.push_back(cell.vis_pt);
         }
     }
     this->newest_T_wl = T_wl;
