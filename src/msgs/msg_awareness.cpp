@@ -1,18 +1,18 @@
-#include "msg_localmap.h"
+#include "msg_awareness.h"
 
-msg_localmap::msg_localmap()
+msg_awareness::msg_awareness()
 {
 
 }
 
-msg_localmap::msg_localmap(ros::NodeHandle& nh, string topic_name, int buffersize)
+msg_awareness::msg_awareness(ros::NodeHandle& nh, string topic_name, int buffersize)
 {
-    this->localmap_pub = nh.advertise<glmapping::localmap>(topic_name,buffersize);
+    this->localmap_pub = nh.advertise<mlmapping::awareness>(topic_name,buffersize);
 }
 
-void msg_localmap::pub(local_map_cylindrical *map, ros::Time stamp)
+void msg_awareness::pub(awareness_map_cylindrical *map, ros::Time stamp)
 {
-    glmapping::localmap msg;
+    mlmapping::awareness msg;
     msg.header.stamp = stamp;
     msg.occupied_cell_count = static_cast<unsigned int>(map->occupied_cell_idx.size());
     for(auto cell: map->occupied_cell_idx)
@@ -32,8 +32,8 @@ void msg_localmap::pub(local_map_cylindrical *map, ros::Time stamp)
 
 }
 
-void msg_localmap::unpack(glmapping::localmapConstPtr msg_ptr,
-                          local_map_cylindrical *map_output)
+void msg_awareness::unpack(mlmapping::awarenessConstPtr msg_ptr,
+                          awareness_map_cylindrical *map_output)
 {
     map_output->T_wl = SE3(Quaterniond(msg_ptr->T_w_l.rotation.w,
                                 msg_ptr->T_w_l.rotation.x,

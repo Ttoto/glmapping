@@ -5,7 +5,7 @@ Global2OccupancyGrid2D::Global2OccupancyGrid2D(ros::NodeHandle& nh, string topic
     this->occupancygrid_pub = nh.advertise<nav_msgs::OccupancyGrid>(topic_name, buffersize);
 }
 
-void Global2OccupancyGrid2D::setGlobalMap(global_map_cartesian &map, string world_fram_name)
+void Global2OccupancyGrid2D::setGlobalMap(local_map_cartesian &map, string world_fram_name)
 {
 
     this->map2d_nx = map.map_nx;
@@ -29,7 +29,7 @@ void Global2OccupancyGrid2D::setGlobalMap(global_map_cartesian &map, string worl
     }
 }
 
-void Global2OccupancyGrid2D::pub_occupancy_grid_2D_from_globalmap(global_map_cartesian &map, ros::Time stamp)
+void Global2OccupancyGrid2D::pub_occupancy_grid_2D_from_globalmap(local_map_cartesian &map, ros::Time stamp)
 {
 
     occupancy_grid.header.stamp = stamp;

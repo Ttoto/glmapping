@@ -1,18 +1,18 @@
-#include "msg_local2global.h"
+#include "msg_awareness2local.h"
 
-msg_local2global::msg_local2global()
+msg_awareness2local::msg_awareness2local()
 {
 
 }
 
-msg_local2global::msg_local2global(ros::NodeHandle& nh, string topic_name, int buffersize)
+msg_awareness2local::msg_awareness2local(ros::NodeHandle& nh, string topic_name, int buffersize)
 {
-    l2g_pub = nh.advertise<glmapping::local2global>(topic_name,buffersize);
+    l2g_pub = nh.advertise<mlmapping::awareness2local>(topic_name,buffersize);
 }
 
-void msg_local2global::pub(const SE3 T_w_l, vector<Vec3> obs_pts, vector<Vec3> miss_pts, ros::Time stamp)
+void msg_awareness2local::pub(const SE3 T_w_l, vector<Vec3> obs_pts, vector<Vec3> miss_pts, ros::Time stamp)
 {
-    glmapping::local2global l2g_msg;
+    mlmapping::awareness2local l2g_msg;
     l2g_msg.header.stamp = stamp;
     l2g_msg.pt_obs_count = obs_pts.size();
     l2g_msg.pt_miss_count = miss_pts.size();
@@ -44,7 +44,7 @@ void msg_local2global::pub(const SE3 T_w_l, vector<Vec3> obs_pts, vector<Vec3> m
     l2g_pub.publish(l2g_msg);
 }
 
-void msg_local2global::unpack(glmapping::local2globalConstPtr ptr,
+void msg_awareness2local::unpack(mlmapping::awareness2localConstPtr ptr,
                               SE3 &T_w_l,
                               vector<Vec3> &l2g_obs_l,
                               vector<Vec3> &l2g_miss_l,

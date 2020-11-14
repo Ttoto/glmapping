@@ -12,23 +12,23 @@
 #include <tf2_ros/transform_broadcaster.h>
 
 #include <utils/include/all_utils.h>
-#include <local_map_cylindrical.h>
+#include <map_awareness.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <rviz_vis.h>
-#include <msg_local2global.h>
-#include <msg_localmap.h>
+#include <msg_awareness2local.h>
+#include <msg_awareness.h>
 
-namespace glmapping_ns
+namespace mlmapping_ns
 {
 
 using namespace std;
 
-class LocalMapNodeletClass : public nodelet::Nodelet
+class AwarenessMapNodeletClass : public nodelet::Nodelet
 {
 public:
-    LocalMapNodeletClass()  {;}
-    ~LocalMapNodeletClass() {;}
+    AwarenessMapNodeletClass()  {;}
+    ~AwarenessMapNodeletClass() {;}
 private:
 
     message_filters::Subscriber<sensor_msgs::PointCloud2> pc_sub;
@@ -38,10 +38,10 @@ private:
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, geometry_msgs::PoseStamped> ApproxSyncPolicy;
     message_filters::Synchronizer<ApproxSyncPolicy> * approxSync_;
 
-    msg_local2global* l2g_pub;
-    msg_localmap*     locamap_pub;
+    msg_awareness2local* l2g_pub;
+    msg_awareness*     locamap_pub;
 
-    local_map_cylindrical* local_map;
+    awareness_map_cylindrical* local_map;
     bool enable_downsample;
     int  pc_sample_cnt;
     bool raycasting_flag;
@@ -61,32 +61,32 @@ private:
 
     virtual void onInit()
     {
-        cout << "localmapnode:" << endl;
+        cout << "awareness map node:" << endl;
         ros::NodeHandle& nh = getMTPrivateNodeHandle();
         string configFilePath;
-        nh.getParam("/glmapping_configfile",   configFilePath);
-        cout << "read the config file" << endl;
+        nh.getParam("/mlmapping_configfile",   configFilePath);
+        cout << "config file path: " << configFilePath << endl;
 
-        double d_Rho          = getDoubleVariableFromYaml(configFilePath,"glmapping_lm_d_Rho");
-        double d_Phi_deg      = getDoubleVariableFromYaml(configFilePath,"glmapping_lm_d_Phi_deg");
-        double d_Z            = getDoubleVariableFromYaml(configFilePath,"glmapping_lm_d_Z");
-        int    n_Rho          = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Rho");
-        int    n_Z_below      = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Z_below");
-        int    n_Z_over       = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Z_over");
+        double d_Rho          = getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Rho");
+        double d_Phi_deg      = getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Phi_deg");
+        double d_Z            = getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Z");
+        int    n_Rho          = getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Rho");
+        int    n_Z_below      = getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Z_below");
+        int    n_Z_over       = getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Z_over");
         Mat4x4  T_bs_mat      = Mat44FromYaml(configFilePath,"T_B_S");
         bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
-        pc_sample_cnt         = getIntVariableFromYaml(configFilePath,"glmapping_lm_n_Rho");
-        raycasting_flag       = getBoolVariableFromYaml(configFilePath,"glmapping_use_raycasting");
+        pc_sample_cnt         = getIntVariableFromYaml(configFilePath, "mlmapping_sample_cnt");
+        raycasting_flag       = getBoolVariableFromYaml(configFilePath,"mlmapping_use_raycasting");
         publish_T_wb          = getBoolVariableFromYaml(configFilePath,"publish_T_wb");
         publish_T_bs          = getBoolVariableFromYaml(configFilePath,"publish_T_bs");
         frame_id              = getStringFromYaml(configFilePath,"world_frame_id");
         body_frame_id         = getStringFromYaml(configFilePath,"body_frame_id");
         sensor_frame_id       = getStringFromYaml(configFilePath,"sensor_frame_id");
-        local_frame_id        = getStringFromYaml(configFilePath,"localmap_frame_id");
+        local_frame_id        = getStringFromYaml(configFilePath,"awareness_frame_id");
         T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
                    T_bs_mat.topRightCorner(3,1));
-        locamap_pub = new msg_localmap(nh,"/glmapping_localmap");
-        l2g_pub     = new msg_local2global(nh,"/local2global",2);
+        locamap_pub = new msg_awareness(nh,"/mlmapping_awareness");
+        l2g_pub     = new msg_awareness2local(nh,"/awareness2local",2);
 
         transformStamped_T_wb.header.frame_id = frame_id;
         transformStamped_T_wb.child_frame_id  = body_frame_id;
@@ -114,7 +114,7 @@ private:
         downsample_size   = 1000;
 
         //init map
-        local_map = new local_map_cylindrical();
+        local_map = new awareness_map_cylindrical();
         local_map->setTbs(T_bs);
         local_map->init_map(d_Rho,d_Phi_deg,d_Z,n_Rho,n_Z_below,n_Z_over,raycasting_flag);
 
@@ -122,18 +122,18 @@ private:
 
         if(use_exactsync)
         {
-            pc_sub.subscribe(nh,   "/glmapping/pc", 10);
-            pose_sub.subscribe(nh, "/glmapping/pose", 10);
+            pc_sub.subscribe(nh,   "/mlmapping/pc", 10);
+            pose_sub.subscribe(nh, "/mlmapping/pose", 10);
             exactSync_ = new message_filters::Synchronizer<ExactSyncPolicy>(ExactSyncPolicy(5), pc_sub, pose_sub);
-            exactSync_->registerCallback(boost::bind(&LocalMapNodeletClass::pc_pose_input_callback, this, _1, _2));
+            exactSync_->registerCallback(boost::bind(&AwarenessMapNodeletClass::pc_pose_input_callback, this, _1, _2));
             cout << "ExactSyncPolicy" << endl;
         }
         else
         {
-            pc_sub.subscribe(nh,   "/glmapping/pc", 1);
-            pose_sub.subscribe(nh, "/glmapping/pose", 1);
+            pc_sub.subscribe(nh,   "/mlmapping/pc", 1);
+            pose_sub.subscribe(nh, "/mlmapping/pose", 1);
             approxSync_ = new message_filters::Synchronizer<ApproxSyncPolicy>(ApproxSyncPolicy(100), pc_sub, pose_sub);
-            approxSync_->registerCallback(boost::bind(&LocalMapNodeletClass::pc_pose_input_callback, this, _1, _2));
+            approxSync_->registerCallback(boost::bind(&AwarenessMapNodeletClass::pc_pose_input_callback, this, _1, _2));
             cout << "ApproxSyncPolicy" << endl;
         }
         ros::Rate rate(10.0);
@@ -233,9 +233,9 @@ private:
     }
 
 
-};//class LocalMapNodeletClass
-}//namespace glmapping_ns
+};//class AwarenessMapNodeletClass
+}//namespace mlmapping_ns
 
-PLUGINLIB_EXPORT_CLASS(glmapping_ns::LocalMapNodeletClass, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(mlmapping_ns::AwarenessMapNodeletClass, nodelet::Nodelet)
 
 

@@ -1,27 +1,27 @@
-#include "local_map_cylindrical.h"
+#include "map_awareness.h"
 
-local_map_cylindrical::local_map_cylindrical()
+awareness_map_cylindrical::awareness_map_cylindrical()
 {
 
 }
 
-inline size_t local_map_cylindrical::mapIdx(Vec3I Rho_Phi_z)
+inline size_t awareness_map_cylindrical::mapIdx(Vec3I Rho_Phi_z)
 {
     return this->mapIdx(Rho_Phi_z(0),Rho_Phi_z(1),Rho_Phi_z(2));
 }
-inline size_t local_map_cylindrical::mapIdx(int Rho, int Phi, int z)
+inline size_t awareness_map_cylindrical::mapIdx(int Rho, int Phi, int z)
 {
     return static_cast<size_t>(z*this->nRho_x_nPhi
                                +Phi*this->map_nRho
                                +Rho);
 }
 
-void local_map_cylindrical::setTbs(SE3 T_bs_in)
+void awareness_map_cylindrical::setTbs(SE3 T_bs_in)
 {
     this->T_bs=T_bs_in;
 }
 
-void local_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double d_Z, int n_Rho, int n_z_below, int n_z_over, bool apply_raycasting)
+void awareness_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double d_Z, int n_Rho, int n_z_below, int n_z_over, bool apply_raycasting)
 {
     this->map_dRho = d_Rho;
     this->map_dPhi = d_Phi_deg * M_PI / 180;
@@ -72,7 +72,7 @@ void local_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double d_Z,
     visibility_check = apply_raycasting;
 }
 
-bool local_map_cylindrical::xyz2RhoPhiZwithBoderCheck(Vec3 xyz_l, Vec3I &rhophiz)
+bool awareness_map_cylindrical::xyz2RhoPhiZwithBoderCheck(Vec3 xyz_l, Vec3I &rhophiz)
 {
     double rho = sqrt(pow(xyz_l(0),2)+pow(xyz_l(1),2));
     int rho_idx =  static_cast<int>(rho/this->map_dRho);
@@ -94,7 +94,7 @@ bool local_map_cylindrical::xyz2RhoPhiZwithBoderCheck(Vec3 xyz_l, Vec3I &rhophiz
     return false;
 }
 
-void local_map_cylindrical::clear_map()
+void awareness_map_cylindrical::clear_map()
 {
     for(auto& cell:*this->map)
     {
@@ -103,7 +103,7 @@ void local_map_cylindrical::clear_map()
     this->occupied_cell_idx.clear();
 }
 
-void local_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
+void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
 {
     this->l2g_msg_hit_pts_l.clear();
     this->l2g_msg_miss_pts_l.clear();

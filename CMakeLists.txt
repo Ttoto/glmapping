@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(glmapping)
+project(mlmapping)
 
 set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS} -O3 -Wall -pthread") # -Wextra -Werror
 set(CMAKE_BUILD_TYPE "RELEASE")
@@ -26,8 +26,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
     FILES
-    local2global.msg
-    localmap.msg
+    awareness2local.msg
+    awareness.msg
     globalmap.msg
     esdfs.msg
     )
@@ -56,25 +56,25 @@ include_directories(SYSTEM
     )
 
 ## Declare a C++ library
-add_library(glmapping
-    src/nodelet_globalmap.cpp
-    src/nodelet_localmap.cpp
-    src/local_map_cylindrical.cpp
-    src/global_map_cartesian.cpp
+add_library(mlmapping
+    src/nodelet_awareness.cpp
+#    src/nodelet_local.cpp
+    src/map_awareness.cpp
+    src/map_local.cpp
     src/rviz_vis.cpp
-    src/msgs/msg_local2global.cpp
-    src/msgs/msg_localmap.cpp
+    src/msgs/msg_awareness2local.cpp
+    src/msgs/msg_awareness.cpp
 #    src/global2occupancygrid2d.cpp
 #    src/global2esdf.cpp
 #    src/global2esdf3d.cpp
     )
 
-add_dependencies(glmapping
+add_dependencies(mlmapping
     glmapping_generate_messages_cpp
     ${catkin_EXPORTED_TARGETS}
     )
 
-target_link_libraries(glmapping
+target_link_libraries(mlmapping
     ${catkin_LIBRARIES}
     ${CSPARSE_LIBRARY}
     ${Sophus_LIBRARIES}
@@ -85,9 +85,9 @@ target_link_libraries(glmapping
 
 add_executable(visualization
     src/node_visualization.cpp
-    src/local_map_cylindrical.cpp
-    src/global_map_cartesian.cpp
-    src/msgs/msg_localmap.cpp
+    src/map_awareness.cpp
+    src/map_local.cpp
+    src/msgs/msg_awareness.cpp
     src/rviz_vis.cpp
     )
 add_dependencies(visualization

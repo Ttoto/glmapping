@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>glmapping</name>
+  <name>mlmapping</name>
   <version>0.1.0</version>
   <description>vo</description>
 
@@ -33,7 +33,7 @@
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <nodelet plugin="${prefix}/glmapping.xml" />
+    <nodelet plugin="${prefix}/mlmapping.xml" />
   </export>
 
 </package>

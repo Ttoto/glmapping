@@ -2,7 +2,7 @@
 #define GLOBAL2ESDF3D_H
 
 #include <nav_msgs/OccupancyGrid.h>
-#include <global_map_cartesian.h>
+#include <local_map_cartesian.h>
 #include <utils/include/all_utils.h>
 #include <ros/ros.h>
 #include <ros/publisher.h>
@@ -41,8 +41,8 @@ public:
     ros::Publisher esdf_pub;
     
     Global2ESDF3DPatch(ros::NodeHandle& nh, string topic_name, int buffersize=2);
-    void setGlobalMap(global_map_cartesian &map, string world_fram_name="world");
-    void pub_ESDF_3D_from_globalmap(global_map_cartesian &map, ros::Time stamp=ros::Time::now());
+    void setGlobalMap(local_map_cartesian &map, string world_fram_name="world");
+    void pub_ESDF_3D_from_globalmap(local_map_cartesian &map, ros::Time stamp=ros::Time::now());
 
 };
 

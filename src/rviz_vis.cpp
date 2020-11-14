@@ -83,7 +83,7 @@ Vec3 cubeColer(double ratio)
     return Vec3(red/260.0,grn/260.0,blu/260.0);
 }
 
-void rviz_vis::pub_localmap(local_map_cylindrical* localmap, const ros::Time stamp)
+void rviz_vis::pub_localmap(awareness_map_cylindrical* localmap, const ros::Time stamp)
 {
     visualization_msgs::Marker spheres;
     spheres.header.frame_id  = this->localmap_frame_id;

@@ -1,11 +1,11 @@
-#ifndef LOCAL_MAP_CYLINDRICAL_H
-#define LOCAL_MAP_CYLINDRICAL_H
+#ifndef awareness_map_cylindrical_H
+#define awareness_map_cylindrical_H
 
 #include <utils/include/all_utils.h>
-#include <cell_local_cylindrical.h>
-#include <glmapping/local2global.h>
+#include <cell_cylindrical.h>
+#include <mlmapping/awareness2local.h>
 
-class local_map_cylindrical
+class awareness_map_cylindrical
 {
 private:
     int nRho_x_nPhi;
@@ -33,7 +33,7 @@ public:
     vector<unsigned int> occupied_cell_idx;
 
     //Init
-    local_map_cylindrical();
+    awareness_map_cylindrical();
     void setTbs(SE3 T_bs_in);
     void init_map(double d_Rho, double d_Phi_deg, double d_Z, int n_Rho, int n_z_below, int n_z_over, bool apply_raycasting);
     void clear_map();
@@ -46,4 +46,4 @@ public:
     void input_pc_pose(vector<Vec3> PC_s, SE3 T_wb);
 };
 
-#endif // LOCAL_MAP_CYLINDRICAL_H
+#endif // awareness_map_cylindrical_H

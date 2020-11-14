@@ -1,48 +1,55 @@
 
 ##glmapping parameter
-#Localmap radius d_Rho*n_Rho
+#Awareness map radius d_Rho*n_Rho
 #devition of orientation 360/d_Phi_deg
 #n_Z = Z_below + Z_over + 1;
 #Number of grid n_Rho*(360/d_Phi)*(nz_below+nz_over+1)
 
-glmapping_lm_d_Rho:         0.1
-glmapping_lm_d_Phi_deg:       3
-glmapping_lm_d_Z:           0.1
-glmapping_lm_n_Rho:          30
-glmapping_lm_n_Z_below:      25
-glmapping_lm_n_Z_over:       25
+mlmapping_am_d_Rho:         0.1
+mlmapping_am_d_Phi_deg:       2
+mlmapping_am_d_Z:           0.1
+mlmapping_am_n_Rho:          30
+mlmapping_am_n_Z_below:      25
+mlmapping_am_n_Z_over:       25
 
-#Golbalmap papameter
-glmapping_gm_d_xyz:           0.1
+#Lolbalmap papameter
 #n_xy/n_z available value     3x(2n+1)  3x(odd number)  E.g 27 45 75 81 135 165 243 ...
-glmapping_gm_n_xy:            75
-glmapping_gm_n_z:             45
-
-
-glmapping_gm_log_odds_min:      -2.0
-glmapping_gm_log_odds_max:       4.0
-glmapping_gm_measurement_hit:    0.7
-glmapping_gm_measurement_miss:  -0.4
-glmapping_gm_occupied_sh:        2.2
-
+mlmapping_lm_d_xyz:           0.1
+mlmapping_lm_n_xy:            75
+mlmapping_lm_n_z:             45
+mlmapping_lm_log_odds_min:      -2.0
+mlmapping_lm_log_odds_max:       4.0
+mlmapping_lm_measurement_hit:    0.7
+mlmapping_lm_measurement_miss:  -0.4
+mlmapping_lm_occupied_sh:        2.2
 
 
 use_exactsync:     false
-glmapping_use_raycasting:   true
-glmapping_sample_cnt:       200
+mlmapping_sample_cnt:       200
+mlmapping_use_raycasting:   true
+mlmapping_enable_esdfs:     false
+mlmapping_enable_2d_grid:   false
 
 publish_T_wb:      true
-world_frame_id:    "map"
-body_frame_id:     "body_frame"
-
 publish_T_bs:      true
+
 ##transformation from sensor frame to body frame
+sensor_frame_id:   "camera_depth_optical_frame"
 T_B_S:
 [  0.0,   0.0,  1.0,  0.12,
   -1.0,   0.0,  0.0,  0.0,
    0.0,  -1.0,  0.0,  0.0,
    0.0,   0.0,  0.0,  1.0]
-sensor_frame_id:   "camera_depth_optical_frame"
 
-##localmap_frame_base: tranlation is link to body frame, no rotation
-localmap_frame_id: "localmap_frame"
+
+body_frame_id:      "body_frame"
+awareness_frame_id: "awareness_frame"
+local_frame_id:     "local_frame"
+world_frame_id:     "map"
+
+
+
+
+
+
+

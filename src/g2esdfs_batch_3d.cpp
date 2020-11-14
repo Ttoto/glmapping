@@ -5,7 +5,7 @@ Global2ESDF3DPatch::Global2ESDF3DPatch(ros::NodeHandle& nh, string topic_name, i
     this->esdf_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffersize);
 }
 
-void Global2ESDF3DPatch::setGlobalMap(global_map_cartesian &map, string world_fram_name)
+void Global2ESDF3DPatch::setGlobalMap(local_map_cartesian &map, string world_fram_name)
 {
     this->map3d_nx = map.map_nx;
     this->map3d_ny = map.map_ny;
@@ -55,7 +55,7 @@ Vec3 Global2ESDF3DPatch::esdf_cube_coler(double ratio)
     return Vec3(red/260.0,grn/260.0,blu/260.0);
 }
 
-void Global2ESDF3DPatch::pub_ESDF_3D_from_globalmap(global_map_cartesian &map, ros::Time stamp)
+void Global2ESDF3DPatch::pub_ESDF_3D_from_globalmap(local_map_cartesian &map, ros::Time stamp)
 {
 
     for (size_t i=0; i<ESDF_BATCH_SIZE_NZ; i++)

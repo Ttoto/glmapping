@@ -1,4 +1,4 @@
-#include "global_map_cartesian.h"
+#include "map_local.h"
 
 double prob2logit(double prob)
 {
@@ -14,46 +14,41 @@ double logit2prob(double logit)
     return prob;
 }
 
-global_map_cartesian::global_map_cartesian()
+local_map_cartesian::local_map_cartesian()
 {
 
 }
 
-size_t global_map_cartesian::mapIdx(Vec3I xyz_idx)
+size_t local_map_cartesian::mapIdx(Vec3I xyz_idx)
 {
     return this->mapIdx(xyz_idx(0),xyz_idx(1),xyz_idx(2));
 }
-size_t global_map_cartesian::mapIdx(int x_idx, int y_idx, int z_idx)
+size_t local_map_cartesian::mapIdx(int x_idx, int y_idx, int z_idx)
 {
     return static_cast<size_t>( z_idx*this->map_nx_times_ny
-                                +y_idx*this->map_nx
+                                +y_idx*this->map_dxyz
                                 +x_idx);
 }
 
-void global_map_cartesian::setTbs(SE3 T_bs_in)
+void local_map_cartesian::setTbs(SE3 T_bs_in)
 {
     this->T_bs=T_bs_in;
 }
 
-void global_map_cartesian::init_map(double d_x, double d_y, double d_z,
-                                    int n_x, int n_y, int n_z, double min_z,
+void local_map_cartesian::init_map(double d_xyz,
+                                    int n_xy, int n_z,
                                     int measurement_volume,
                                     double occupied_sh, double free_sh)
 {
-    this->map_dx = d_x;
-    this->map_dy = d_y;
-    this->map_dz = d_z;
-    this->map_nx = n_x;
-    this->map_ny = n_y;
+    this->map_dxyz = d_xyz;
+    this->map_nxy = n_xy;
     this->map_nz = n_z;
-    this->map_min_z = min_z;
-    this->map_nx_times_ny = n_x*n_y;
-    this->map_min_x = -(this->map_nx/2)*this->map_dx;
-    this->map_min_y = -(this->map_ny/2)*this->map_dy;
-    cout  << "map_nx"  <<  map_nx  <<endl;
-    cout  << "map_ny"  <<  map_ny  <<endl;
-    cout  << "map_nz"  <<  map_nz  <<endl;
-    cout  << "min_z" <<  min_z << endl;
+
+    this->map_nx_times_ny = n_xy*n_xy;
+    this->map_min_x = 0;
+    this->map_min_y = 0;
+    this->map_min_z = 0;
+
     //this->creat_map();
     first_input = true;
     visibility_check = true;
@@ -77,19 +72,19 @@ void global_map_cartesian::init_map(double d_x, double d_y, double d_z,
     cout << "----" << endl;
 }
 
-void global_map_cartesian::creat_map(void)
+void local_map_cartesian::creat_map(void)
 {
 
     for (int z=0; z<this->map_nz; z++)
     {
-        for (int y=0; y<this->map_ny; y++)
+        for (int y=0; y<this->map_nxy; y++)
         {
-            for (int x=0; x<this->map_nx; x++)
+            for (int x=0; x<this->map_nxy; x++)
             {
                 CARTESIAN_CELL cell;
-                double vis_x = this->map_min_x+(this->map_dx/2)+(x*this->map_dx);
-                double vis_y = this->map_min_y+(this->map_dy/2)+(y*this->map_dy);
-                double vis_z = this->map_min_z+(this->map_dz/2)+(z*this->map_dz);
+                double vis_x = this->map_min_x+(this->map_dxyz/2)+(x*this->map_dxyz);
+                double vis_y = this->map_min_y+(this->map_dxyz/2)+(y*this->map_dxyz);
+                double vis_z = this->map_min_z+(this->map_dxyz/2)+(z*this->map_dxyz);
 
                 this->map.push_back(cell);
             }
@@ -98,30 +93,30 @@ void global_map_cartesian::creat_map(void)
     cout << map.size() << endl;
 }
 
-Vec3I global_map_cartesian::xyz2xyzIdx(Vec3 xyz_w)
+Vec3I local_map_cartesian::xyz2xyzIdx(Vec3 xyz_w)
 {
     double x = xyz_w(0)-this->map_min_x;
-    int x_idx =  static_cast<int>(x/this->map_dx);
+    int x_idx =  static_cast<int>(x/this->map_dxyz);
     double y = xyz_w(1)-this->map_min_y;
-    int y_idx =  static_cast<int>(y/this->map_dy);
+    int y_idx =  static_cast<int>(y/this->map_dxyz);
     double z = xyz_w(2)-this->map_min_z;
-    int z_idx =  static_cast<int>(z/this->map_dz);
+    int z_idx =  static_cast<int>(z/this->map_dxyz);
     return Vec3I(x_idx,y_idx,z_idx);
 }
 
-bool global_map_cartesian::xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx)
+bool local_map_cartesian::xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx)
 {
     double x = xyz_w(0)-this->map_min_x;
-    int x_idx =  static_cast<int>(x/this->map_dx);
+    int x_idx =  static_cast<int>(x/this->map_dxyz);
     double y = xyz_w(1)-this->map_min_y;
-    int y_idx =  static_cast<int>(y/this->map_dy);
+    int y_idx =  static_cast<int>(y/this->map_dxyz);
     double z = xyz_w(2)-this->map_min_z;
-    int z_idx =  static_cast<int>(z/this->map_dz);
+    int z_idx =  static_cast<int>(z/this->map_dxyz);
     if(x>0 && y>0 && z>0)
     {
         if( x>0 && y>0 && z>0
                 && x_idx>=0 && y_idx>=0 && z_idx>=0
-                && x_idx < this->map_nx && y_idx < this->map_ny && z_idx < this->map_nz)
+                && x_idx < this->map_nxy && y_idx < this->map_nxy && z_idx < this->map_nz)
         {
             xyz_idx = Vec3I(x_idx,y_idx,z_idx);
             return true;
@@ -130,7 +125,7 @@ bool global_map_cartesian::xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx)
     return false;
 }
 
-void global_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss_l, SE3 T_wl)
+void local_map_cartesian::input_pc_pose(vector<Vec3> PC_l, vector<Vec3> PC_miss_l, SE3 T_wl)
 {
     //Frame [w]orld, [s]ensor, [b]ody, [l]ocalmap;
     vector<Vec3> pc_w;
