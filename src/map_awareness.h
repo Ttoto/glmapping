@@ -2,8 +2,18 @@
 #define awareness_map_cylindrical_H
 
 #include <utils/include/all_utils.h>
-#include <cell_cylindrical.h>
 #include <mlmapping/awareness2local.h>
+
+struct CYLINDRICAL_CELL{
+  unsigned int idx;
+  unsigned int idx_rho;
+  unsigned int idx_phi;
+  unsigned int idx_z;
+  Vec3 center_pt;
+  Vec3 sampled_xyz;
+  double raycasting_z_over_rho;
+  bool is_occupied;
+};
 
 class awareness_map_cylindrical
 {

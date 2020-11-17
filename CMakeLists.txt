@@ -58,9 +58,10 @@ include_directories(SYSTEM
 ## Declare a C++ library
 add_library(mlmapping
     src/nodelet_awareness.cpp
-#    src/nodelet_local.cpp
+    src/nodelet_local.cpp
     src/map_awareness.cpp
     src/map_local.cpp
+    src/map_warehouse.cpp
     src/rviz_vis.cpp
     src/msgs/msg_awareness2local.cpp
     src/msgs/msg_awareness.cpp
@@ -70,7 +71,7 @@ add_library(mlmapping
     )
 
 add_dependencies(mlmapping
-    glmapping_generate_messages_cpp
+    mlmapping_generate_messages_cpp
     ${catkin_EXPORTED_TARGETS}
     )
 
@@ -91,7 +92,7 @@ add_executable(visualization
     src/rviz_vis.cpp
     )
 add_dependencies(visualization
-    glmapping_generate_messages_cpp
+    mlmapping_generate_messages_cpp
     ${catkin_EXPORTED_TARGETS}
     )
 target_link_libraries(visualization

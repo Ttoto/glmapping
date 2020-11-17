@@ -61,8 +61,8 @@ void msg_awareness2local::unpack(mlmapping::awareness2localConstPtr ptr,
     uq.y() = ptr->T_w_l.rotation.y;
     uq.z() = ptr->T_w_l.rotation.z;
     T_w_l = SE3(uq,t);
-    int num_obs = ptr->pt_obs_count;
-    int num_miss = ptr->pt_miss_count;
+    size_t num_obs = ptr->pt_obs_count;
+    size_t num_miss = ptr->pt_miss_count;
     for(size_t i=0; i<num_obs; i++)
     {
         l2g_obs_l.push_back(Vec3(ptr->pts_obs_l.at(i).x,ptr->pts_obs_l.at(i).y,ptr->pts_obs_l.at(i).z));

@@ -21,8 +21,8 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "listener");
   ros::NodeHandle nh;
   cout << "this is visualization node" << endl;
-
-
+  cout << sizeof(float) << endl;
+  cout << sizeof(double) << endl;
   cout << "visualization_node started" << endl;
   string configFilePath;
   nh.getParam("/mlmapping_configfile",   configFilePath);
