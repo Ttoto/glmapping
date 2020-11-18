@@ -1,4 +1,4 @@
-#ifndef CC_RVIZ_VIS_H
+#ifndef RVIZ_VIS_H
 #define RVIZ_VIS_H
 #include <ros/ros.h>
 #include <map_awareness.h>
@@ -14,36 +14,31 @@ public:
     ~rviz_vis();
 
     ros::Publisher map_pub;
-    string localmap_frame_id;
-    string global_frame_id;
+    string frame_id;
     double min_z;
     double max_z;
     double range_z;
-    double cube_size_xy;
-    double cube_size_z;
+    double cube_size_xyz;
 
     //for localmap
-    void set_as_localmap_publisher(ros::NodeHandle& nh,
-                string topic_name,
-                string frame_id,
-                unsigned int buffer_size,
-                double minz,
-                double maxz);
+    void set_as_awareness_map_publisher(ros::NodeHandle& nh,
+                                        string topic_name,
+                                        string frame_id,
+                                        unsigned int buffer_size,
+                                        double minz,
+                                        double maxz);
 
     //for globalmap
-    void set_as_globalmap_publisher(ros::NodeHandle& nh,
-                string topic_name,
-                string frame_id,
-                unsigned int buffer_size,
-                double minz,
-                double maxz,
-                double gm_cube_size_xy,
-                double gm_cube_size_z);
+    void set_as_local_map_publisher(ros::NodeHandle& nh,
+                                    string topic_name,
+                                    string frame_id,
+                                    unsigned int buffer_size,
+                                    local_map_cartesian* localmap);
 
-    void pub_localmap(awareness_map_cylindrical* localmap,
-                      const ros::Time stamp);
+    void pub_awareness_map(awareness_map_cylindrical* localmap,
+                           const ros::Time stamp);
 
-    void pub_globalmap(const vector<Vec3>& pts3d,
+    void pub_local_map(local_map_cartesian* localmap,
                        const ros::Time stamp);
 
 

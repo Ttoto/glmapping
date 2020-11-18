@@ -12,7 +12,7 @@ rviz_vis*              globalmap_rviz_pub;
 void localmap_msg_callback(const mlmapping::awarenessConstPtr localmap_msg)
 {
   msg_awareness::unpack(localmap_msg,local_map);
-  localmap_rviz_pub->pub_localmap(local_map,localmap_msg->header.stamp);
+  localmap_rviz_pub->pub_awareness_map(local_map,localmap_msg->header.stamp);
 }
 
 int main(int argc, char **argv)
@@ -20,10 +20,10 @@ int main(int argc, char **argv)
 
   ros::init(argc, argv, "listener");
   ros::NodeHandle nh;
-  cout << "this is visualization node" << endl;
-  cout << sizeof(float) << endl;
-  cout << sizeof(double) << endl;
-  cout << "visualization_node started" << endl;
+//  cout << "this is visualization node" << endl;
+//  cout << sizeof(float) << endl;
+//  cout << sizeof(double) << endl;
+//  cout << "visualization_node started" << endl;
   string configFilePath;
   nh.getParam("/mlmapping_configfile",   configFilePath);
   double d_Rho          = getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Rho");
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
   local_map->map_tmp.release();
 
   localmap_rviz_pub =  new rviz_vis();
-  localmap_rviz_pub->set_as_localmap_publisher(nh,"/awareness_map",local_frame_id,3,-n_Z_below*d_Z,n_Z_over*d_Z);
+  localmap_rviz_pub->set_as_awareness_map_publisher(nh,"/awareness_map",local_frame_id,3,-n_Z_below*d_Z,n_Z_over*d_Z);
   ros::Subscriber sub = nh.subscribe("/mlmapping_awareness", 1, localmap_msg_callback);
 
   ros::spin();

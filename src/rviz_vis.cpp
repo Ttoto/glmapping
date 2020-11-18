@@ -11,7 +11,7 @@ rviz_vis::~rviz_vis()
 
 }
 
-void rviz_vis::set_as_localmap_publisher(ros::NodeHandle& nh,
+void rviz_vis::set_as_awareness_map_publisher(ros::NodeHandle& nh,
                          string topic_name,
                          string frame_id,
                          unsigned int buffer_size,
@@ -19,28 +19,27 @@ void rviz_vis::set_as_localmap_publisher(ros::NodeHandle& nh,
                          double maxz)
 {
     this->map_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffer_size);
-    this->localmap_frame_id = frame_id;
+    this->frame_id = frame_id;
     this->min_z = minz;
     this->max_z = maxz;
     this->range_z = max_z-min_z;
 }
 
-void rviz_vis::set_as_globalmap_publisher(ros::NodeHandle& nh,
+void rviz_vis::set_as_local_map_publisher(ros::NodeHandle& nh,
                    string topic_name,
                    string frame_id,
                    unsigned int buffer_size,
-                   double minz,
-                   double maxz,
-                   double gm_cube_size_xy,
-                   double gm_cube_size_z)
+                   local_map_cartesian* localmap)
 {
     this->map_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffer_size);
-    this->global_frame_id = frame_id;
-    this->cube_size_xy = gm_cube_size_xy;
-    this->cube_size_z = gm_cube_size_z;
-    this->min_z = minz;
-    this->max_z = maxz;
+    this->frame_id = frame_id;
+    this->cube_size_xyz = localmap->vis_paras.cube_size_xyz;
+    this->min_z = localmap->vis_paras.map_minz;
+    this->max_z = localmap->vis_paras.map_maxz;
     this->range_z = max_z-min_z;
+    cout << "range z=" << range_z << endl;
+    cout << "min_z z=" << min_z << endl;
+    cout << "max_z z=" << max_z << endl;
 }
 
 //input: ratio is between 0 to 1
@@ -83,10 +82,10 @@ Vec3 cubeColer(double ratio)
     return Vec3(red/260.0,grn/260.0,blu/260.0);
 }
 
-void rviz_vis::pub_localmap(awareness_map_cylindrical* localmap, const ros::Time stamp)
+void rviz_vis::pub_awareness_map(awareness_map_cylindrical* localmap, const ros::Time stamp)
 {
     visualization_msgs::Marker spheres;
-    spheres.header.frame_id  = this->localmap_frame_id;
+    spheres.header.frame_id  = this->frame_id;
     spheres.header.stamp = stamp;
     spheres.ns = "points";
     spheres.type = visualization_msgs::Marker::SPHERE_LIST;
@@ -120,20 +119,20 @@ void rviz_vis::pub_localmap(awareness_map_cylindrical* localmap, const ros::Time
     }
 }
 
-void rviz_vis::pub_globalmap(const vector<Vec3> &pts3d, const ros::Time stamp)
+void rviz_vis::pub_local_map(local_map_cartesian* localmap, const ros::Time stamp)
 {
     visualization_msgs::Marker cubes;
-    cubes.header.frame_id  = this->global_frame_id;
+    cubes.header.frame_id  = this->frame_id;
     cubes.header.stamp = stamp;
     cubes.ns = "points";
     cubes.type = visualization_msgs::Marker::CUBE_LIST;
     cubes.action = visualization_msgs::Marker::ADD;
     cubes.pose.orientation.w =  1.0;
-    cubes.scale.x = cubes.scale.y = cube_size_xy;
-    cubes.scale.z = cube_size_z;
+    cubes.scale.x = cubes.scale.y = cubes.scale.z = cube_size_xyz;
     cubes.id = 0;
-    for (auto pt:pts3d) {
+    for (auto i:localmap->occupied_cell_idx) {
         geometry_msgs::Point point;
+        Vec3 pt = localmap->map.at(i).center_pt;
         point.x = pt.x();
         point.y = pt.y();
         point.z = pt.z();
@@ -151,4 +150,25 @@ void rviz_vis::pub_globalmap(const vector<Vec3> &pts3d, const ros::Time stamp)
     {
         this->map_pub.publish(cubes);
     }
+    //publish the range
+    visualization_msgs::Marker range;
+    range.header.frame_id = this->frame_id;
+    range.header.stamp = ros::Time();
+    range.ns = "range";
+    range.id = 0;
+    range.type = visualization_msgs::Marker::CUBE;
+    range.action = visualization_msgs::Marker::ADD;
+    range.pose.position.x = range.pose.position.y = range.pose.position.z = 0;
+    range.pose.orientation.x = 0.0;
+    range.pose.orientation.y = 0.0;
+    range.pose.orientation.z = 0.0;
+    range.pose.orientation.w = 1.0;
+    range.scale.x = range.scale.y = localmap->vis_paras.map_size_xy;
+    range.scale.z = localmap->vis_paras.map_size_z;
+    range.color.a = 0.1; // Don't forget to set the alpha!
+    range.color.r = 0.0;
+    range.color.g = 1.0;
+    range.color.b = 0.0;
+    //only if using a MESH_RESOURCE marker type:
+    this->map_pub.publish(range);
 }

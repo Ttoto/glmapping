@@ -13,9 +13,9 @@ mlmapping_am_n_Z_below:      25
 mlmapping_am_n_Z_over:       25
 
 #Lolbalmap papameter
-#n_xy/n_z available value     3x(2n+1)  3x(odd number)  E.g 27 45 75 81 135 165 243 ...
+#n_xy/n_z available value     3x(2n+1)  3x(odd number)  E.g 27 39 45 75 81 135 165 195 243 ...
 mlmapping_lm_d_xyz:           0.1
-mlmapping_lm_n_xy:            75
+mlmapping_lm_n_xy:            195
 mlmapping_lm_n_z:             45
 mlmapping_lm_log_odds_min:      -2.0
 mlmapping_lm_log_odds_max:       4.0
