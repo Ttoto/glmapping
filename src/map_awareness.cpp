@@ -56,7 +56,7 @@ void awareness_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double 
                 cell.center_pt = Vec3(center_x,center_y,center_z);
                 cell.is_occupied = false;
                 if(rho>0){
-                    cell.raycasting_z_over_rho = (z-map_center_z_idx)/rho;
+                    cell.raycasting_z_over_rho = (z-map_center_z_idx)/(rho*1.0);
                 }else {
                     cell.raycasting_z_over_rho = 0;
                 }
@@ -167,7 +167,7 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
                 for (int r=rpz_idx[0]-2; r>0 ; r--)
                 {
                     int diff_r = rpz_idx[0]-r;
-                    int raycasting_z = static_cast<int>(round(rpz_idx[0]-(diff_r*raycasting_rate)));
+                    int raycasting_z = static_cast<int>(round(rpz_idx[2]-(diff_r*raycasting_rate)));
                     map->at(this->mapIdx(Vec3I(r,rpz_idx[1],raycasting_z))).is_occupied = false;
                     l2g_msg_miss_pts_l.push_back(map->at(this->mapIdx(Vec3I(r,rpz_idx[1],raycasting_z))).center_pt);
                 }
