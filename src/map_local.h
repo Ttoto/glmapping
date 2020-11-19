@@ -2,40 +2,17 @@
 #define local_map_cartesian_H
 
 #include <utils/include/all_utils.h>
+#include <data_type.h>
+#include <map_warehouse.h>
 
-typedef struct CARTESIAN_CELL{
-    unsigned int idx;
-    unsigned int relevant_submap_idx;
-    unsigned int idx_x;
-    unsigned int idx_y;
-    unsigned int idx_z;
-    Vec3  center_pt;
-    bool  is_occupied;
-    float log_odds;
-    float sd;
-}CARTESIAN_CELL;
-
-typedef struct SUBMAP_CELL{
-    Vec3  center_pt;
-    bool  is_occupied;
-}SUBMAP_CELL;
-
-typedef struct SUBMAP_INFO{
-    unsigned idx;
-    Vec3  offset_min_xyz;
-    Vec3  center_xyz;
-    unsigned int num_occupied_cell;
-}SUBMAP_INFO;
-
-typedef struct SUBMAP{
-    SUBMAP_INFO submap_info;
-    vector<SUBMAP_CELL> cells;
-}SUBMAP;
 
 typedef struct SUBMAP_IN_LOCAL_PARA{
     unsigned int submap_nxy;
     unsigned int submap_nz;
     Vec3 submap_diff_center_offset;
+    Vec3 diff_1st_close_submap_center_localmap_min;
+    double relevant_submap_search_range_xy;
+    double relevant_submap_search_range_z;
 }SUBMAP_IN_LOCAL_PARA;
 
 typedef struct SUBMAP_SWITCHING_CHECK_LIST{
@@ -78,7 +55,8 @@ private:
     unsigned int map_nz;
 
     SUBMAP_IN_LOCAL_PARA        submap_paras;
-    SUBMAP_SWITCHING_CHECK_LIST sub_map_switching_check_list[27];
+    SUBMAP_SWITCHING_CHECK_LIST sub_map_switching_check_list[27];//cloest 27 submaps
+    SUBMAP                      sub_maps[125];
 
     Vec3I xyz2xyzIdx(Vec3 xyz_w);
     bool  xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx);
@@ -102,7 +80,13 @@ public:
                   float log_odds_miss_in,
                   float log_odds_occupied_sh_in);
     void allocate_memory_for_local_map();
-    void input_pc_pose(vector<Vec3> PC_hit_a, vector<Vec3> PC_miss_a, SE3 T_wa);
+    void devide_local_map_to_submaps();
+    bool get_the_relevant_submap_for_new_localmap(vector<unsigned int>& relevant_and_occupied_idx,
+                                                  vector<unsigned int>& unrelevant_and_occupied_idx);
+    void input_pc_pose(vector<Vec3> PC_hit_a,
+                       vector<Vec3> PC_miss_a,
+                       SE3 T_wa,
+                       map_warehouse* warehouse);
 };
 
 #endif // local_map_cartesian_H

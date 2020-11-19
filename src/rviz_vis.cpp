@@ -130,12 +130,13 @@ void rviz_vis::pub_local_map(local_map_cartesian* localmap, const ros::Time stam
     cubes.pose.orientation.w =  1.0;
     cubes.scale.x = cubes.scale.y = cubes.scale.z = cube_size_xyz;
     cubes.id = 0;
+    //cout << "localmap occupied_cell_idx size " << localmap->occupied_cell_idx.size() << endl;
     for (auto i:localmap->occupied_cell_idx) {
         geometry_msgs::Point point;
         Vec3 pt = localmap->map.at(i).center_pt;
-        point.x = pt.x();
-        point.y = pt.y();
-        point.z = pt.z();
+        point.x = pt(0);
+        point.y = pt(1);
+        point.z = pt(2);
         cubes.points.push_back(point);
         double ratio = (pt.z()-min_z)/range_z;
         Vec3 rgb = cubeColer(ratio);
@@ -171,4 +172,17 @@ void rviz_vis::pub_local_map(local_map_cartesian* localmap, const ros::Time stam
     range.color.b = 0.0;
     //only if using a MESH_RESOURCE marker type:
     this->map_pub.publish(range);
+    visualization_msgs::Marker range2=range;
+    visualization_msgs::Marker range3=range;
+    range2.id = 1;
+    range2.scale.x = range2.scale.y = localmap->vis_paras.map_size_xy*0.2;
+    range2.scale.z = localmap->vis_paras.map_size_z*0.2;
+    range2.color.a = 0.3;
+    this->map_pub.publish(range2);
+    range3.id = 2;
+    range3.scale.x = range3.scale.y = localmap->vis_paras.map_size_xy*0.6;
+    range3.scale.z = localmap->vis_paras.map_size_z*0.6;
+    range3.color.a = 0.2;
+    this->map_pub.publish(range3);
+
 }
