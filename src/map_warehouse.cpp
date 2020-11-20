@@ -13,12 +13,16 @@ bool map_warehouse::searchSubMap(Vec3 center_xyz, double dis_sh_xy, double dis_s
 {
     bool ret=false;
     idx.clear();
+    cout <<dis_sh_xy << "   " << dis_sh_z << endl;
     for (auto submap:this->warehouse) {
         Vec3 diff = submap.submap_info.center_xyz - center_xyz;
         if(fabs(diff(0))<dis_sh_xy && fabs(diff(1))<dis_sh_xy && fabs(diff(2))<dis_sh_z)
         {
             idx.push_back(submap.submap_info.idx);
-            //cout << submap.submap_info.idx << " in warehouse relevant to localmap" << endl;
+            cout << submap.submap_info.idx << " in warehouse relevant to localmap" << endl;
+            cout << submap.submap_info.center_xyz.transpose() << endl;
+            cout << center_xyz.transpose() << endl;
+            cout << diff.transpose() << endl;
             ret =  true;
         }
     }
@@ -30,7 +34,8 @@ void map_warehouse::addSubMap(SUBMAP submap)
     submap.submap_info.idx = unique_id;
     unique_id++;
     warehouse.push_back(submap);
-    cout << "submap in warehouse" << warehouse.size() << endl;
+    cout << "add submap with center: " << submap.submap_info.center_xyz.transpose() << endl;
+    //cout << "submap in warehouse" << warehouse.size() << endl;
 }
 
 void map_warehouse::deleteSubMap(vector<unsigned int> idx)
@@ -55,5 +60,5 @@ void map_warehouse::deleteSubMap(vector<unsigned int> idx)
     {
         warehouse.erase (warehouse.begin()+i);
     }
-    cout << "submap in warehouse" << warehouse.size() << endl;
+    //cout << "submap in warehouse" << warehouse.size() << endl;
 }

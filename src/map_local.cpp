@@ -55,9 +55,16 @@ bool local_map_cartesian::xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx)
 
 void local_map_cartesian::devide_local_map_to_submaps()
 {
+    Vec3 diff_min_center = map_min_xyz - map_center_xyz;
     for(unsigned int i=0;i<125;i++)
     {
         sub_maps[i].cells.clear();
+        sub_maps[i].submap_info.center_xyz=Vec3(
+                    map_min_x + submap_paras.submap_diff_center_offset(0) + (i%5)*map_dxyz*submap_paras.submap_nxy,
+                    map_min_y + submap_paras.submap_diff_center_offset(1) + ((i%25)/5)*map_dxyz*submap_paras.submap_nxy,
+                    map_min_z + submap_paras.submap_diff_center_offset(2) + (i/25)*map_dxyz*submap_paras.submap_nz
+                    );
+        sub_maps[i].submap_info.offset_min_xyz = diff_min_center + sub_map_switching_check_list[i].submap_info.center_xyz;
     }
     for(auto idx:this->occupied_cell_idx)
     {
@@ -97,7 +104,7 @@ void local_map_cartesian::init_map(double d_xyz_in,
                 (0.5*map_dxyz)+(floor(submap_paras.submap_nxy/2.0)+submap_paras.submap_nxy)*map_dxyz,
                 (0.5*map_dxyz)+(floor(submap_paras.submap_nz/2.0)+submap_paras.submap_nz)*map_dxyz);
     submap_paras.relevant_submap_search_range_xy = 2.2*this->submap_paras.submap_nxy*this->map_dxyz;
-    submap_paras.relevant_submap_search_range_z  = 2.2*this->submap_paras.submap_nxy*this->map_dxyz;
+    submap_paras.relevant_submap_search_range_z  = 2.2*this->submap_paras.submap_nz*this->map_dxyz;
     map_nx_times_ny = n_xy_in*n_xy_in;
     map_min_x = 0;
     map_min_y = 0;
@@ -199,17 +206,8 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
         T_wl =  SE3(SO3(0,0,0),map_center_xyz);
         //init the switching check list
         Vec3 diff_min_center = map_min_xyz - map_center_xyz;
-        cout << "map center: " << T_wl.translation().transpose() << " offset " << map_min_xyz.transpose() << endl;
-        for(size_t i=0; i<125; i++)
-        {
-            sub_maps[i].submap_info.center_xyz=Vec3(
-                        map_min_x + submap_paras.submap_diff_center_offset(0) + (i%5)*map_dxyz*submap_paras.submap_nxy,
-                        map_min_y + submap_paras.submap_diff_center_offset(1) + ((i%25)/5)*map_dxyz*submap_paras.submap_nxy,
-                        map_min_z + submap_paras.submap_diff_center_offset(2) + (i/25)*map_dxyz*submap_paras.submap_nz
-                        );
-            sub_maps[i].submap_info.offset_min_xyz = diff_min_center + sub_map_switching_check_list[i].submap_info.center_xyz;
-            //cout << "submap idx: " << i << " center: " << sub_maps[i].submap_info.center_xyz.transpose() << endl;
-        }
+        //cout << "map center: " << T_wl.translation().transpose() <<  endl;
+
         for(size_t i=0; i<27; i++)
         {
             sub_map_switching_check_list[i].submap_info.center_xyz=Vec3(
@@ -253,7 +251,7 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
             map_min_y = map_min_xyz(1);
             map_min_z = map_min_xyz(2);
             T_wl =  SE3(SO3(0,0,0),map_center_xyz);
-            cout << "map center: " << T_wl.translation().transpose() << " offset " << map_min_xyz.transpose() << endl;
+            cout << "new map center: " << T_wl.translation().transpose() << endl;
             for(auto& i: map)
             {
                 i.is_occupied=false;
@@ -262,13 +260,14 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
             vector<unsigned int> relevant, unrelavant, relevant_from_warehouse;
             if(this->get_the_relevant_submap_for_new_localmap(relevant,unrelavant))
             {
-                cout << "these submap are relevant to the new localmap: ";
-                for(unsigned int idx:relevant){
-                    cout << idx << " ";
-                }
-                cout << endl;
+//                cout << "these submap are relevant to the new localmap: ";
+//                for(unsigned int idx:relevant){
+//                    cout << idx << " ";
+//                }
+//                cout << endl;
             }
-            if(warehouse->searchSubMap(map_center_xyz,submap_paras.relevant_submap_search_range_xy,
+            if(warehouse->searchSubMap(map_center_xyz,
+                                       submap_paras.relevant_submap_search_range_xy,
                                        submap_paras.relevant_submap_search_range_z,
                                        relevant_from_warehouse))
             {
@@ -296,16 +295,6 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
 
             //STEP4: init the switching check list
             Vec3 diff_min_center = map_min_xyz - map_center_xyz;
-            for(size_t i=0; i<125; i++)
-            {
-                sub_maps[i].submap_info.center_xyz=Vec3(
-                            map_min_x + submap_paras.submap_diff_center_offset(0) + (i%5)*map_dxyz*submap_paras.submap_nxy,
-                            map_min_y + submap_paras.submap_diff_center_offset(1) + ((i%25)/5)*map_dxyz*submap_paras.submap_nxy,
-                            map_min_z + submap_paras.submap_diff_center_offset(2) + (i/25)*map_dxyz*submap_paras.submap_nz
-                            );
-                sub_maps[i].submap_info.offset_min_xyz = diff_min_center + sub_map_switching_check_list[i].submap_info.center_xyz;
-                //cout << "submap idx: " << i << " center: " << sub_maps[i].submap_info.center_xyz.transpose() << endl;
-            }
             for(size_t i=0; i<27; i++)
             {
                 sub_map_switching_check_list[i].submap_info.center_xyz=Vec3(
@@ -321,7 +310,6 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
             {
                 warehouse->addSubMap(sub_maps[unrelavant.at(i)]);
             }
-            cout << relevant_from_warehouse.size();
             warehouse->deleteSubMap(relevant_from_warehouse);
         }
     }

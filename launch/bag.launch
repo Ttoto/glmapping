@@ -3,7 +3,7 @@
     <param name ="/use_sim_time" value="true"/>
     <!--sim_planner1-->
 <!--Input######################################################################################################-->
-    <node pkg="rosbag" type="play" name="rosbag" output="log" args="$(find mlmapping)/bag/mlmapping_test.bag --clock">
+    <node pkg="rosbag" type="play" name="rosbag" output="log" args="$(find mlmapping)/bag/mlmapping_test.bag -r3 --clock">
     </node>
 
 <!--rviz#######################################################################################################-->
