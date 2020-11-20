@@ -278,6 +278,7 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
                 }
                 cout << endl;
             }
+            //recover from previous localmap
             for(unsigned int idx:relevant)
             {
                 for(SUBMAP_CELL cell : sub_maps[idx].cells)
@@ -291,6 +292,7 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
                     }
                 }
             }
+            //recover from warehouse localmap
 
             //STEP4: init the switching check list
             Vec3 diff_min_center = map_min_xyz - map_center_xyz;
@@ -317,13 +319,10 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
             //STEP5: add submaps to warehouse & delete submaps in warehouse
             for(unsigned int i=0; i<unrelavant.size(); i++)
             {
-                cout << "here1" << endl;
                 warehouse->addSubMap(sub_maps[unrelavant.at(i)]);
             }
-            cout << "here2" << endl;
             cout << relevant_from_warehouse.size();
             warehouse->deleteSubMap(relevant_from_warehouse);
-            cout << "here3" << endl;
         }
     }
     //update map.

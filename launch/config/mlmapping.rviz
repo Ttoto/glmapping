@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /TF1
         - /TF1/Frames1
         - /MLMapping1
         - /MLMapping1/Local Map1
@@ -174,25 +175,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 28.438753128051758
+      Distance: 54.190773010253906
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 8.269057273864746
-        Y: -11.56937026977539
-        Z: -6.929967880249023
+        X: 6.646745204925537
+        Y: 12.861498832702637
+        Z: -8.22614574432373
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.009796882048249245
+      Pitch: 0.27979734539985657
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.239427089691162
+      Yaw: 3.7175633907318115
     Saved: ~
 Window Geometry:
   Displays:

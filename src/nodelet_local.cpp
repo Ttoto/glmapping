@@ -49,6 +49,7 @@ private:
     ros::Subscriber sub_from_local;
     local_map_cartesian* local_map;
     map_warehouse* warehouse;
+    rviz_vis*      localmap_publisher;
     rviz_vis*      globalmap_publisher;
     tf2_ros::TransformBroadcaster br;
     geometry_msgs::TransformStamped transformStamped_T_wl;
@@ -72,7 +73,8 @@ private:
         transformStamped_T_wl.transform.translation.z = T_wl.translation().z();
         transformStamped_T_wl.header.stamp = stamp;
         br.sendTransform(transformStamped_T_wl);
-        globalmap_publisher->pub_local_map(local_map,stamp);
+        localmap_publisher->pub_local_map(local_map,stamp);
+        globalmap_publisher->pub_global_map(warehouse,stamp);
         //        occupancy_grid_publisher->pub_occupancy_grid_2D_from_globalmap(*local_map,stamp);
         //        esfd3d_publisher->pub_ESDF_3D_from_globalmap(*local_map,stamp);
         //        if((ros::Time::now().toSec()-last_esft_stamp.toSec())>0.19)
@@ -146,11 +148,15 @@ private:
         transformStamped_T_wl.transform.rotation.y = 0;
         transformStamped_T_wl.transform.rotation.z = 0;
         transformStamped_T_wl.transform.rotation.w = 1;
-        globalmap_publisher =  new rviz_vis();
-        globalmap_publisher->set_as_local_map_publisher(nh,"/local_map",
+        localmap_publisher =  new rviz_vis();
+        localmap_publisher->set_as_local_map_publisher(nh,"/local_map",
                                                         getStringFromYaml(configFilePath,"local_frame_id"),
                                                         5,
                                                         local_map);
+        globalmap_publisher = new rviz_vis();
+        globalmap_publisher->set_as_global_map_publisher(nh,"/global_map",
+                                                         getStringFromYaml(configFilePath,"world_frame_id"),
+                                                         5);
         last_esft_stamp = ros::Time::now();
         sub_from_local = nh.subscribe<mlmapping::awareness2local>(
                     "/awareness2local",

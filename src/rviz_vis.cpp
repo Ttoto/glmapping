@@ -42,6 +42,15 @@ void rviz_vis::set_as_local_map_publisher(ros::NodeHandle& nh,
     cout << "max_z z=" << max_z << endl;
 }
 
+void rviz_vis::set_as_global_map_publisher(ros::NodeHandle& nh,
+                   string topic_name,
+                   string frame_id,
+                   unsigned int buffer_size)
+{
+    this->map_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffer_size);
+    this->frame_id = frame_id;
+}
+
 //input: ratio is between 0 to 1
 //output: rgb color
 Vec3 sphereColer(double ratio)
@@ -186,3 +195,31 @@ void rviz_vis::pub_local_map(local_map_cartesian* localmap, const ros::Time stam
     this->map_pub.publish(range3);
 
 }
+
+//typedef pcl::PointXYZ             PointP;
+//typedef pcl::PointCloud<PointP>   PointCloudP;
+//typedef PointCloudP::Ptr          PointCloudP_ptr;
+
+void rviz_vis::pub_global_map(map_warehouse* warehouse,
+                              const ros::Time stamp)
+{
+    cout << "publish global map" << endl;
+    sensor_msgs::PointCloud2 output;
+    PointCloudP_ptr pc (new PointCloudP);
+    pc->header.frame_id = this->frame_id;
+    pc->height = pc->width = 1;
+    for(auto submap:warehouse->warehouse)
+    {
+        for(auto cell:submap.cells)
+        {
+            pc->points.push_back (PointP(cell.pt_w.x(), cell.pt_w.y(), cell.pt_w.z()));
+        }
+    }
+    pcl::toROSMsg(*pc , output);
+    output.header.stamp = stamp;
+    map_pub.publish (output);
+
+}
+
+
+
