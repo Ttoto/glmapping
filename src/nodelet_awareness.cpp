@@ -29,31 +29,24 @@ public:
     AwarenessMapNodeletClass()  {;}
     ~AwarenessMapNodeletClass() {;}
 private:
-
-    ros::Timer timer_;
+    //subscriber
     message_filters::Subscriber<sensor_msgs::PointCloud2> pc_sub;
     message_filters::Subscriber<geometry_msgs::PoseStamped> pose_sub;
     typedef message_filters::sync_policies::ExactTime<sensor_msgs::PointCloud2, geometry_msgs::PoseStamped> ExactSyncPolicy;
     message_filters::Synchronizer<ExactSyncPolicy> * exactSync_;
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, geometry_msgs::PoseStamped> ApproxSyncPolicy;
     message_filters::Synchronizer<ApproxSyncPolicy> * approxSync_;
-
+    //publisher
     msg_awareness2local* l2g_pub;
-    msg_awareness*     locamap_pub;
-
+    msg_awareness*       locamap_pub;
+    tf2_ros::TransformBroadcaster br;
+    //Timer
+    ros::Timer timer_;
+    //variable
     awareness_map_cylindrical* local_map;
-    bool enable_downsample;
-    int  pc_sample_cnt;
-    bool raycasting_flag;
-    int  downsample_size;
+    int    pc_sample_cnt;
     bool   publish_T_wb;
     bool   publish_T_bs;
-    string frame_id;
-    string body_frame_id;
-    string sensor_frame_id;
-    string awareness_frame_id;
-    SE3 T_bs;
-    tf2_ros::TransformBroadcaster br;
     geometry_msgs::TransformStamped transformStamped_T_wb;
     geometry_msgs::TransformStamped transformStamped_T_wa;
     geometry_msgs::TransformStamped transformStamped_T_bs;
@@ -73,8 +66,6 @@ private:
         if(publish_T_wb)
         {
             transformStamped_T_wb.header.stamp = pose_Ptr->header.stamp;
-            transformStamped_T_wb.header.frame_id = frame_id;
-            transformStamped_T_wb.child_frame_id  = body_frame_id;
             transformStamped_T_wb.transform.translation.x = T_wb.translation().x();
             transformStamped_T_wb.transform.translation.y = T_wb.translation().y();
             transformStamped_T_wb.transform.translation.z = T_wb.translation().z();
@@ -158,29 +149,27 @@ private:
         nh.getParam("/mlmapping_configfile",   configFilePath);
         cout << "config file path: " << configFilePath << endl;
 
-        double d_Rho          = getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Rho");
-        double d_Phi_deg      = getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Phi_deg");
-        double d_Z            = getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Z");
-        int    n_Rho          = getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Rho");
-        int    n_Z_below      = getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Z_below");
-        int    n_Z_over       = getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Z_over");
-        Mat4x4  T_bs_mat      = Mat44FromYaml(configFilePath,"T_B_S");
-        bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
+        //init map
         pc_sample_cnt         = getIntVariableFromYaml(configFilePath, "mlmapping_sample_cnt");
-        raycasting_flag       = getBoolVariableFromYaml(configFilePath,"mlmapping_use_raycasting");
-        publish_T_wb          = getBoolVariableFromYaml(configFilePath,"publish_T_wb");
-        publish_T_bs          = getBoolVariableFromYaml(configFilePath,"publish_T_bs");
-        frame_id              = getStringFromYaml(configFilePath,"world_frame_id");
-        body_frame_id         = getStringFromYaml(configFilePath,"body_frame_id");
-        sensor_frame_id       = getStringFromYaml(configFilePath,"sensor_frame_id");
-        awareness_frame_id    = getStringFromYaml(configFilePath,"awareness_frame_id");
-        T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
-                   T_bs_mat.topRightCorner(3,1));
-        locamap_pub = new msg_awareness(nh,"/mlmapping_awareness");
-        l2g_pub     = new msg_awareness2local(nh,"/awareness2local",2);
+        local_map = new awareness_map_cylindrical();
 
-        transformStamped_T_wb.header.frame_id = frame_id;
-        transformStamped_T_wb.child_frame_id  = body_frame_id;
+        Mat4x4  T_bs_mat      = Mat44FromYaml(configFilePath,"T_B_S");
+        SE3 T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
+                       T_bs_mat.topRightCorner(3,1));
+        local_map->setTbs(T_bs);
+        local_map->init_map(getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Rho"),
+                            getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Phi_deg"),
+                            getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Z"),
+                            getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Rho"),
+                            getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Z_below"),
+                            getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Z_over"),
+                            getBoolVariableFromYaml(configFilePath,"mlmapping_use_raycasting"));
+
+        //init transform
+        //transformStamped_T_wb
+        publish_T_wb = getBoolVariableFromYaml(configFilePath,"publish_T_wb");
+        transformStamped_T_wb.header.frame_id = getStringFromYaml(configFilePath,"world_frame_id");
+        transformStamped_T_wb.child_frame_id  = getStringFromYaml(configFilePath,"body_frame_id");
         transformStamped_T_wb.transform.translation.x = 0;
         transformStamped_T_wb.transform.translation.y = 0;
         transformStamped_T_wb.transform.translation.z = 0;
@@ -188,11 +177,13 @@ private:
         transformStamped_T_wb.transform.rotation.y = 0;
         transformStamped_T_wb.transform.rotation.z = 0;
         transformStamped_T_wb.transform.rotation.w = 1;
+        //transformStamped_T_wa
         transformStamped_T_wa=transformStamped_T_wb;
-        transformStamped_T_wa.child_frame_id = awareness_frame_id;
-
-        transformStamped_T_bs.header.frame_id = body_frame_id;
-        transformStamped_T_bs.child_frame_id  = sensor_frame_id;
+        transformStamped_T_wa.child_frame_id = getStringFromYaml(configFilePath,"awareness_frame_id");
+        //transformStamped_T_bs
+        publish_T_bs = getBoolVariableFromYaml(configFilePath,"publish_T_bs");
+        transformStamped_T_bs.header.frame_id = getStringFromYaml(configFilePath,"body_frame_id");
+        transformStamped_T_bs.child_frame_id  = getStringFromYaml(configFilePath,"sensor_frame_id");
         transformStamped_T_bs.transform.translation.x = T_bs.translation().x();
         transformStamped_T_bs.transform.translation.y = T_bs.translation().y();
         transformStamped_T_bs.transform.translation.z = T_bs.translation().z();
@@ -201,15 +192,10 @@ private:
         transformStamped_T_bs.transform.rotation.z = T_bs.so3().unit_quaternion().z();
         transformStamped_T_bs.transform.rotation.w = T_bs.so3().unit_quaternion().w();
 
-        enable_downsample = true;
-        downsample_size   = 1000;
-
-        //init map
-        local_map = new awareness_map_cylindrical();
-        local_map->setTbs(T_bs);
-        local_map->init_map(d_Rho,d_Phi_deg,d_Z,n_Rho,n_Z_below,n_Z_over,raycasting_flag);
-
-        //init the local map
+        //init publisher
+        locamap_pub = new msg_awareness(nh,"/mlmapping_awareness");
+        l2g_pub     = new msg_awareness2local(nh,"/awareness2local",2);
+        bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
 
         if(use_exactsync)
         {

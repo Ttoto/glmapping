@@ -46,7 +46,6 @@ private:
 
     double map_dxyz;
     Vec3   map_min_xyz;
-    Vec3   map_center_xyz;
     double map_min_x;
     double map_min_y;
     double map_min_z;
@@ -66,6 +65,7 @@ private:
 public:
 
     SE3 T_wl; //Transformation from local to world
+    Vec3   map_center_xyz;
     vector<unsigned int> occupied_cell_idx;
     vector<CARTESIAN_CELL> map;
     LOCALMAP_VIS_PARA vis_paras;

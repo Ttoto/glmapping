@@ -15,13 +15,12 @@ void rviz_vis::set_as_awareness_map_publisher(ros::NodeHandle& nh,
                          string topic_name,
                          string frame_id,
                          unsigned int buffer_size,
-                         double minz,
-                         double maxz)
+                         awareness_map_cylindrical* awareness_map)
 {
     this->map_pub = nh.advertise<visualization_msgs::Marker>(topic_name, buffer_size);
     this->frame_id = frame_id;
-    this->min_z = minz;
-    this->max_z = maxz;
+    this->min_z = awareness_map->z_border_min;
+    this->max_z = awareness_map->z_border_min + (awareness_map->map_dZ*awareness_map->map_nZ);
     this->range_z = max_z-min_z;
 }
 
@@ -37,9 +36,6 @@ void rviz_vis::set_as_local_map_publisher(ros::NodeHandle& nh,
     this->min_z = localmap->vis_paras.map_minz;
     this->max_z = localmap->vis_paras.map_maxz;
     this->range_z = max_z-min_z;
-    cout << "range z=" << range_z << endl;
-    cout << "min_z z=" << min_z << endl;
-    cout << "max_z z=" << max_z << endl;
 }
 
 void rviz_vis::set_as_global_map_publisher(ros::NodeHandle& nh,
@@ -219,8 +215,35 @@ void rviz_vis::pub_global_map(map_warehouse* warehouse,
     pcl::toROSMsg(*pc , output);
     output.header.stamp = stamp;
     map_pub.publish (output);
-
 }
 
 
+void rviz_vis::pub_global_local_map(map_warehouse* warehouse,
+                                    local_map_cartesian* localmap,
+                                    const ros::Time stamp)
+{
+    //cout << "publish global map" << endl;
+    sensor_msgs::PointCloud2 output;
+    PointCloudP_ptr pc (new PointCloudP);
+    pc->header.frame_id = this->frame_id;
+    pc->height = 1;
+    for(auto submap:warehouse->warehouse)
+    {
+        for(auto cell:submap.cells)
+        {
+            pc->points.push_back (PointP(cell.pt_w.x(), cell.pt_w.y(), cell.pt_w.z()));
+        }
+    }
+    Vec3 center_offset = localmap->map_center_xyz;
+    for (auto i:localmap->occupied_cell_idx) {
+        geometry_msgs::Point point;
+        Vec3 pt = localmap->map.at(i).center_pt;
+        pt += center_offset;
+        pc->points.push_back (PointP(pt.x(),pt.y(),pt.z()));
+    }
 
+    pc->width = pc->points.size();
+    pcl::toROSMsg(*pc , output);
+    output.header.stamp = stamp;
+    map_pub.publish (output);
+}

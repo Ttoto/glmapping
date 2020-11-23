@@ -240,8 +240,8 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
         //if so, switch
         if(min_distance_2_center>min_distance_2_other)
         {
-//            cout << "min_distance_2_center=" << min_distance_2_center << " while " << "min_distance_2_other=" << min_distance_2_other << endl;
-//            cout << "switch to " << min_distance_2_other_idx << endl;
+            //            cout << "min_distance_2_center=" << min_distance_2_center << " while " << "min_distance_2_other=" << min_distance_2_other << endl;
+            //            cout << "switch to " << min_distance_2_other_idx << endl;
             //STEP1: devided the map to submaps
             this->devide_local_map_to_submaps();
             //STEP2: switching
@@ -256,28 +256,17 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
             {
                 i.is_occupied=false;
             }
-            //STEP3: recover from warehouse and submaps
+            //STEP3: recover from warehouse and submaps of previous localmap
+            //recover from previous localmap
             vector<unsigned int> relevant, unrelavant, relevant_from_warehouse;
             if(this->get_the_relevant_submap_for_new_localmap(relevant,unrelavant))
             {
-//                cout << "these submap are relevant to the new localmap: ";
-//                for(unsigned int idx:relevant){
-//                    cout << idx << " ";
-//                }
-//                cout << endl;
+                //                cout << "these submap are relevant to the new localmap: ";
+                //                for(unsigned int idx:relevant){
+                //                    cout << idx << " ";
+                //                }
+                //                cout << endl;
             }
-            if(warehouse->searchSubMap(map_center_xyz,
-                                       submap_paras.relevant_submap_search_range_xy,
-                                       submap_paras.relevant_submap_search_range_z,
-                                       relevant_from_warehouse))
-            {
-                cout << "these submap from warehouse are relevant to the new localmap: ";
-                for(unsigned int idx:relevant_from_warehouse){
-                    cout << idx << " ";
-                }
-                cout << endl;
-            }
-            //recover from previous localmap
             for(unsigned int idx:relevant)
             {
                 for(SUBMAP_CELL cell : sub_maps[idx].cells)
@@ -291,7 +280,54 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
                     }
                 }
             }
+            //recover from warehouse
+            if(warehouse->searchSubMap(map_center_xyz,
+                                       submap_paras.relevant_submap_search_range_xy,
+                                       submap_paras.relevant_submap_search_range_z,
+                                       relevant_from_warehouse))
+            {
+                //                cout << "these submap from warehouse are relevant to the new localmap: ";
+                //                for(unsigned int idx:relevant_from_warehouse){
+                //                    cout << idx << " ";
+                //                }
+                //                cout << endl;
+            }
+
+
             //recover from warehouse localmap
+            sort(relevant_from_warehouse.begin(), relevant_from_warehouse.end());
+            for(unsigned int i = 0; i<warehouse->warehouse.size(); i++)
+            {
+                if(relevant_from_warehouse.size()==0) continue;
+                if(warehouse->warehouse[i].submap_info.idx == relevant_from_warehouse.front())
+                {
+                    relevant_from_warehouse.erase(relevant_from_warehouse.begin());
+                    for(SUBMAP_CELL cell : warehouse->warehouse[i].cells)
+                    {
+                        Vec3I xyz_idx;
+                        if(xyz2xyzIdxwithBoderCheck(cell.pt_w,xyz_idx))
+                        {
+                            size_t map_idx=mapIdx(xyz_idx);
+                            map.at(map_idx).log_odds=cell.log_odds;
+                            map.at(mapIdx(xyz_idx)).is_occupied = true;
+                        }
+                    }
+                }
+
+            }
+            for(unsigned int idx:relevant)
+            {
+                for(SUBMAP_CELL cell : sub_maps[idx].cells)
+                {
+                    Vec3I xyz_idx;
+                    if(xyz2xyzIdxwithBoderCheck(cell.pt_w,xyz_idx))
+                    {
+                        size_t map_idx=mapIdx(xyz_idx);
+                        map.at(map_idx).log_odds=cell.log_odds;
+                        map.at(mapIdx(xyz_idx)).is_occupied = true;
+                    }
+                }
+            }
 
             //STEP4: init the switching check list
             Vec3 diff_min_center = map_min_xyz - map_center_xyz;

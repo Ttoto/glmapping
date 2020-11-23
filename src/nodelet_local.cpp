@@ -74,7 +74,8 @@ private:
         transformStamped_T_wl.header.stamp = stamp;
         br.sendTransform(transformStamped_T_wl);
         localmap_publisher->pub_local_map(local_map,stamp);
-        globalmap_publisher->pub_global_map(warehouse,stamp);
+        globalmap_publisher->pub_global_local_map(warehouse,local_map,stamp);
+        //globalmap_publisher->pub_global_map(warehouse,stamp);
         //        occupancy_grid_publisher->pub_occupancy_grid_2D_from_globalmap(*local_map,stamp);
         //        esfd3d_publisher->pub_ESDF_3D_from_globalmap(*local_map,stamp);
         //        if((ros::Time::now().toSec()-last_esft_stamp.toSec())>0.19)

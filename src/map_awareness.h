@@ -10,20 +10,21 @@ class awareness_map_cylindrical
 {
 private:
     int nRho_x_nPhi;
-    double z_border_min;
     SE3 T_bs; //Transformation from sensor to body
     bool visibility_check;
     double map_dRho;
     double map_dPhi;
-    double map_dZ;
     int map_nRho;
     int map_nPhi;
-    int map_nZ;
     int map_center_z_idx;
     SE3 last_T_wl;
     bool first_input;
+
 public:
     SE3 T_wl;
+    int map_nZ;
+    double map_dZ;
+    double z_border_min;
     //Map
     std::unique_ptr<vector<CYLINDRICAL_CELL>> map;
     std::unique_ptr<vector<CYLINDRICAL_CELL>> map_tmp;

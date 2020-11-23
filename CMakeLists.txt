@@ -28,7 +28,7 @@ add_message_files(
     FILES
     awareness2local.msg
     awareness.msg
-    globalmap.msg
+    localmap.msg
     esdfs.msg
     )
 
@@ -101,5 +101,12 @@ target_link_libraries(visualization
     ${CSPARSE_LIBRARY}
     ${Sophus_LIBRARIES}
     ${YAML_CPP_LIBRARIES}
+    )
+
+add_executable(republish_record
+    src/independent_modules/repub_rec.cpp
+    )
+target_link_libraries(republish_record
+    ${catkin_LIBRARIES}
     )
 

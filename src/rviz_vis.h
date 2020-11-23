@@ -27,8 +27,7 @@ public:
                                         string topic_name,
                                         string frame_id,
                                         unsigned int buffer_size,
-                                        double minz,
-                                        double maxz);
+                                        awareness_map_cylindrical* awareness_map);
 
     //for locallmap
     void set_as_local_map_publisher(ros::NodeHandle& nh,
@@ -53,6 +52,9 @@ public:
     void pub_local_map(local_map_cartesian* localmap,
                        const ros::Time stamp);
 
+    void pub_global_local_map(map_warehouse* warehouse,
+                              local_map_cartesian* localmap,
+                              const ros::Time stamp);
 
 };
 
