@@ -1,74 +1,52 @@
-#include "msg_awareness2local.h"
+#include "msg_localmap.h"
 
-//msg_awareness2local::msg_awareness2local()
-//{
+msg_localmap::msg_localmap()
+{
 
-//}
+}
 
-//msg_awareness2local::msg_awareness2local(ros::NodeHandle& nh, string topic_name, int buffersize)
-//{
-//    l2g_pub = nh.advertise<mlmapping::local2global>(topic_name,buffersize);
-//}
+msg_localmap::msg_localmap(ros::NodeHandle& nh, string topic_name, int buffersize)
+{
+    this->localmap_pub = nh.advertise<mlmapping::localmap>(topic_name,buffersize);
+}
 
-//void msg_awareness2local::pub(const SE3 T_w_l, vector<Vec3> obs_pts, vector<Vec3> miss_pts, ros::Time stamp)
-//{
-//    mlmapping::local2global l2g_msg;
-//    l2g_msg.header.stamp = stamp;
-//    l2g_msg.pt_obs_count = obs_pts.size();
-//    l2g_msg.pt_miss_count = miss_pts.size();
-//    for(Vec3 pt:obs_pts)
-//    {
-//        geometry_msgs::Vector3 geo_pt;
-//        geo_pt.x = pt(0);
-//        geo_pt.y = pt(1);
-//        geo_pt.z = pt(2);
-//        l2g_msg.pts_obs_l.push_back(geo_pt);
-//    }
-//    for(Vec3 pt:miss_pts)
-//    {
-//        geometry_msgs::Vector3 geo_pt;
-//        geo_pt.x = pt(0);
-//        geo_pt.y = pt(1);
-//        geo_pt.z = pt(2);
-//        l2g_msg.pts_miss_l.push_back(geo_pt);
-//    }
-//    Vec3 t=T_w_l.translation();
-//    Quaterniond uq= T_w_l.unit_quaternion();
-//    l2g_msg.T_w_l.rotation.w=uq.w();
-//    l2g_msg.T_w_l.rotation.x=uq.x();
-//    l2g_msg.T_w_l.rotation.y=uq.y();
-//    l2g_msg.T_w_l.rotation.z=uq.z();
-//    l2g_msg.T_w_l.translation.x = t(0);
-//    l2g_msg.T_w_l.translation.y = t(1);
-//    l2g_msg.T_w_l.translation.z = t(2);
-//    l2g_pub.publish(l2g_msg);
-//}
+void msg_localmap::pub(local_map_cartesian *map,
+                       ros::Time stamp)
+{
+    mlmapping::localmap msg;
+    msg.header.stamp = stamp;
+    msg.occupied_cell_count = static_cast<unsigned int>(map->occupied_cell_idx.size());
+    for(auto cell: map->occupied_cell_idx)
+    {
+        msg.occupied_cell_idx.push_back(cell);
+    }
+    Vec3 t = map->T_wl.translation();
+    Quaterniond uq= map->T_wl.unit_quaternion();
+    msg.T_w_l.rotation.w=uq.w();
+    msg.T_w_l.rotation.x=uq.x();
+    msg.T_w_l.rotation.y=uq.y();
+    msg.T_w_l.rotation.z=uq.z();
+    msg.T_w_l.translation.x = t(0);
+    msg.T_w_l.translation.y = t(1);
+    msg.T_w_l.translation.z = t(2);
+    localmap_pub.publish(msg);
+}
 
-//void msg_awareness2local::unpack(mlmapping::local2globalConstPtr ptr,
-//                              SE3 &T_w_l,
-//                              vector<Vec3> &l2g_obs_l,
-//                              vector<Vec3> &l2g_miss_l,
-//                              ros::Time &T)
-//{
-//    T=ptr->header.stamp;
-//    Vec3 t;
-//    Quaterniond uq;
-//    t(0) = ptr->T_w_l.translation.x;
-//    t(1) = ptr->T_w_l.translation.y;
-//    t(2) = ptr->T_w_l.translation.z;
-//    uq.w() = ptr->T_w_l.rotation.w;
-//    uq.x() = ptr->T_w_l.rotation.x;
-//    uq.y() = ptr->T_w_l.rotation.y;
-//    uq.z() = ptr->T_w_l.rotation.z;
-//    T_w_l = SE3(uq,t);
-//    int num_obs = ptr->pt_obs_count;
-//    int num_miss = ptr->pt_miss_count;
-//    for(size_t i=0; i<num_obs; i++)
-//    {
-//        l2g_obs_l.push_back(Vec3(ptr->pts_obs_l.at(i).x,ptr->pts_obs_l.at(i).y,ptr->pts_obs_l.at(i).z));
-//    }
-//    for(size_t i=0; i<num_miss; i++)
-//    {
-//        l2g_miss_l.push_back(Vec3(ptr->pts_miss_l.at(i).x,ptr->pts_miss_l.at(i).y,ptr->pts_miss_l.at(i).z));
-//    }
-//}
+void msg_localmap::unpack(mlmapping::localmapConstPtr msg_ptr,
+                          local_map_cartesian *map_output)
+{
+    map_output->T_wl = SE3(Quaterniond(msg_ptr->T_w_l.rotation.w,
+                                msg_ptr->T_w_l.rotation.x,
+                                msg_ptr->T_w_l.rotation.y,
+                                msg_ptr->T_w_l.rotation.z),
+                    Vector3d(msg_ptr->T_w_l.translation.x,
+                             msg_ptr->T_w_l.translation.y,
+                             msg_ptr->T_w_l.translation.z));
+    map_output->clear_map();
+    size_t cnt = msg_ptr->occupied_cell_count;
+    for(size_t i=0; i<cnt; i++)
+    {
+        map_output->occupied_cell_idx.push_back(msg_ptr->occupied_cell_idx.at(i));
+        map_output->map->at(i).is_occupied=true;
+    }
+}

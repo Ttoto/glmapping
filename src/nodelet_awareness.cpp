@@ -37,13 +37,13 @@ private:
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, geometry_msgs::PoseStamped> ApproxSyncPolicy;
     message_filters::Synchronizer<ApproxSyncPolicy> * approxSync_;
     //publisher
-    msg_awareness2local* l2g_pub;
-    msg_awareness*       locamap_pub;
+    msg_awareness2local* a2w_pub;
+    msg_awareness*       awarenessmap_pub;
     tf2_ros::TransformBroadcaster br;
     //Timer
     ros::Timer timer_;
     //variable
-    awareness_map_cylindrical* local_map;
+    awareness_map_cylindrical* awareness_map;
     int    pc_sample_cnt;
     bool   publish_T_wb;
     bool   publish_T_bs;
@@ -114,16 +114,16 @@ private:
             }
         }
 
-        local_map->input_pc_pose(pc_eigen,T_wb);
-        locamap_pub->pub(local_map,pose_Ptr->header.stamp);
-        //this->localmap_publisher->pub_awareness_map(local_map->visualization_cell_list,pose_Ptr->header.stamp);
-        l2g_pub->pub(local_map->T_wl,
-                     local_map->l2g_msg_hit_pts_l,
-                     local_map->l2g_msg_miss_pts_l,
+        awareness_map->input_pc_pose(pc_eigen,T_wb);
+        awarenessmap_pub->pub(awareness_map,pose_Ptr->header.stamp);
+        //this->localmap_publisher->pub_awareness_map(awareness_map->visualization_cell_list,pose_Ptr->header.stamp);
+        a2w_pub->pub(awareness_map->T_wa,
+                     awareness_map->l2g_msg_hit_pts_l,
+                     awareness_map->l2g_msg_miss_pts_l,
                      pose_Ptr->header.stamp);
 
         //update_time.toc("local map update time");
-        //local_map
+        //awareness_map
     }
 
     void timerCb(const ros::TimerEvent& event){
@@ -151,13 +151,13 @@ private:
 
         //init map
         pc_sample_cnt         = getIntVariableFromYaml(configFilePath, "mlmapping_sample_cnt");
-        local_map = new awareness_map_cylindrical();
+        awareness_map = new awareness_map_cylindrical();
 
         Mat4x4  T_bs_mat      = Mat44FromYaml(configFilePath,"T_B_S");
         SE3 T_bs = SE3(T_bs_mat.topLeftCorner(3,3),
                        T_bs_mat.topRightCorner(3,1));
-        local_map->setTbs(T_bs);
-        local_map->init_map(getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Rho"),
+        awareness_map->setTbs(T_bs);
+        awareness_map->init_map(getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Rho"),
                             getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Phi_deg"),
                             getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Z"),
                             getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Rho"),
@@ -193,8 +193,8 @@ private:
         transformStamped_T_bs.transform.rotation.w = T_bs.so3().unit_quaternion().w();
 
         //init publisher
-        locamap_pub = new msg_awareness(nh,"/mlmapping_awareness");
-        l2g_pub     = new msg_awareness2local(nh,"/awareness2local",2);
+        awarenessmap_pub = new msg_awareness(nh,"/mlmapping_awareness");
+        a2w_pub     = new msg_awareness2local(nh,"/awareness2local",2);
         bool use_exactsync    = getBoolVariableFromYaml(configFilePath,"use_exactsync");
 
         if(use_exactsync)

@@ -17,11 +17,11 @@ private:
     int map_nRho;
     int map_nPhi;
     int map_center_z_idx;
-    SE3 last_T_wl;
+    SE3 last_T_wa;
     bool first_input;
 
 public:
-    SE3 T_wl;
+    SE3 T_wa;
     int map_nZ;
     double map_dZ;
     double z_border_min;

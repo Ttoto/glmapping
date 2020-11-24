@@ -1,1 +1,1 @@
-rosbag record /camera/depth/color/points /imu_pose /vo_img0
+rosbag record /camera1/depth/color/points /mavros/local_position/pose

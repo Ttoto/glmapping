@@ -19,7 +19,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <rviz_vis.h>
 #include <msg_awareness2local.h>
-#include <msg_awareness.h>
+#include <msg_localmap.h>
 
 
 #include <mlmapping/awareness2local.h>
@@ -49,14 +49,15 @@ private:
     ros::Subscriber sub_from_local;
     local_map_cartesian* local_map;
     map_warehouse* warehouse;
-    rviz_vis*      localmap_publisher;
+    msg_localmap*  localmap_pub;
     rviz_vis*      globalmap_publisher;
     tf2_ros::TransformBroadcaster br;
     geometry_msgs::TransformStamped transformStamped_T_wl;
+    bool visulize_raycasting;
+
     //    Global2OccupancyGrid2D *occupancy_grid_publisher;
     //    Global2ESDF *esfd2d_publisher;
     //    Global2ESDF3DPatch *esfd3d_publisher;
-    ros::Time last_esft_stamp;
     ros::Publisher map_pub;
 
     void from_awareness_callback(const mlmapping::awareness2localConstPtr & msg)
@@ -73,7 +74,7 @@ private:
         transformStamped_T_wl.transform.translation.z = T_wl.translation().z();
         transformStamped_T_wl.header.stamp = stamp;
         br.sendTransform(transformStamped_T_wl);
-        localmap_publisher->pub_local_map(local_map,stamp);
+        localmap_pub->pub(local_map,stamp);
         globalmap_publisher->pub_global_local_map(warehouse,local_map,stamp);
         //globalmap_publisher->pub_global_map(warehouse,stamp);
         //        occupancy_grid_publisher->pub_occupancy_grid_2D_from_globalmap(*local_map,stamp);
@@ -83,7 +84,7 @@ private:
         //            esfd2d_publisher->pub_ESDF_2D_from_globalmap(*local_map,stamp);
         //        }
 
-        if(1)//visulize raycasting
+        if(visulize_raycasting)//visulize raycasting
         {
             visualization_msgs::Marker spheres;
             spheres.header.frame_id  = "awareness_frame";
@@ -149,23 +150,24 @@ private:
         transformStamped_T_wl.transform.rotation.y = 0;
         transformStamped_T_wl.transform.rotation.z = 0;
         transformStamped_T_wl.transform.rotation.w = 1;
-        localmap_publisher =  new rviz_vis();
-        localmap_publisher->set_as_local_map_publisher(nh,"/local_map",
-                                                        getStringFromYaml(configFilePath,"local_frame_id"),
-                                                        5,
-                                                        local_map);
+
+        visulize_raycasting = getBoolVariableFromYaml(configFilePath,"visulize_raycasting");
+
+        //timer
+        timer_ = nh.createTimer(ros::Duration(0.2), boost::bind(&LocalMapNodeletClass::timerCb, this, _1));
+        //publisher
+        localmap_pub =  new msg_localmap();
+        localmap_pub =  new msg_localmap(nh,"/mlmapping_local");
         globalmap_publisher = new rviz_vis();
         globalmap_publisher->set_as_global_map_publisher(nh,"/global_map",
                                                          getStringFromYaml(configFilePath,"world_frame_id"),
                                                          5);
-        last_esft_stamp = ros::Time::now();
+        map_pub = nh.advertise<visualization_msgs::Marker>("raycasting", 3);
+        //subscriber
         sub_from_local = nh.subscribe<mlmapping::awareness2local>(
                     "/awareness2local",
                     2,
                     boost::bind(&LocalMapNodeletClass::from_awareness_callback, this, _1));
-
-        timer_ = nh.createTimer(ros::Duration(0.2), boost::bind(&LocalMapNodeletClass::timerCb, this, _1));
-        map_pub = nh.advertise<visualization_msgs::Marker>("raycasting", 3);
     }
 
 };//class LocalMapNodeletClass

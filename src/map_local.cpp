@@ -56,7 +56,7 @@ bool local_map_cartesian::xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx)
 void local_map_cartesian::devide_local_map_to_submaps()
 {
     Vec3 diff_min_center = map_min_xyz - map_center_xyz;
-    for(unsigned int i=0;i<125;i++)
+    for(int i=0;i<125;i++)
     {
         sub_maps[i].cells.clear();
         sub_maps[i].submap_info.center_xyz=Vec3(
@@ -65,10 +65,11 @@ void local_map_cartesian::devide_local_map_to_submaps()
                     map_min_z + submap_paras.submap_diff_center_offset(2) + (i/25)*map_dxyz*submap_paras.submap_nz
                     );
         sub_maps[i].submap_info.offset_min_xyz = diff_min_center + sub_map_switching_check_list[i].submap_info.center_xyz;
+        //cout << "submap idx: " << i << " center: " << sub_maps[i].submap_info.center_xyz.transpose() << endl;
     }
     for(auto idx:this->occupied_cell_idx)
     {
-        CARTESIAN_CELL cell_in_localmap = this->map.at(idx);
+        CARTESIAN_CELL cell_in_localmap = this->map->at(idx);
         SUBMAP_CELL cell_in_submap;
         cell_in_submap.pt_w = cell_in_localmap.center_pt + this->map_center_xyz;
         cell_in_submap.log_odds = cell_in_localmap.log_odds;
@@ -129,6 +130,18 @@ void local_map_cartesian::init_map(double d_xyz_in,
     vis_paras.map_size_xy = map_dxyz*map_nxy;
     vis_paras.map_size_z = map_dxyz*map_nz;
     vis_paras.cube_size_xyz = map_dxyz;
+
+    this->map = std::unique_ptr<vector<CARTESIAN_CELL>>(new vector<CARTESIAN_CELL>());
+
+}
+
+void local_map_cartesian::clear_map()
+{
+    for(auto& cell: *this->map)
+    {
+        cell.is_occupied = false;
+    }
+    this->occupied_cell_idx.clear();
 }
 
 void local_map_cartesian::allocate_memory_for_local_map()
@@ -155,12 +168,12 @@ void local_map_cartesian::allocate_memory_for_local_map()
                                       minxy + (map_dxyz/2) + (y*map_dxyz),
                                       minz  + (map_dxyz/2) + (z*map_dxyz));
                 cell.relevant_submap_idx = (z/submap_paras.submap_nz)*25+(y/submap_paras.submap_nxy)*5+(x/submap_paras.submap_nxy);
-                map.push_back(cell);
+                map->push_back(cell);
                 idx_in_order++;
             }
         }
     }
-    cout << "local map contain " << map.size() << " cells"<< endl;
+    cout << "local map contain " << map->size() << " cells"<< endl;
 }
 
 bool local_map_cartesian::get_the_relevant_submap_for_new_localmap(vector<unsigned int>& relevant_and_occupied_idx,
@@ -216,8 +229,7 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
                         map_min_z + submap_paras.diff_1st_close_submap_center_localmap_min(2) + (i/9)*map_dxyz*submap_paras.submap_nz
                         );
             sub_map_switching_check_list[i].submap_info.offset_min_xyz = diff_min_center + sub_map_switching_check_list[i].submap_info.center_xyz;
-            //            cout << "submap idx: " << i << " center: " << sub_map_switching_check_list[i].submap_info.center_xyz.transpose()
-            //                 << "  offset min: " << sub_map_switching_check_list[i].submap_info.offset_min_xyz.transpose() << endl;
+            //cout << "submap idx: " << i << " center: " << sub_map_switching_check_list[i].submap_info.center_xyz.transpose() << endl;
         }
         first_pose = false;
     }else
@@ -251,8 +263,8 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
             map_min_y = map_min_xyz(1);
             map_min_z = map_min_xyz(2);
             T_wl =  SE3(SO3(0,0,0),map_center_xyz);
-            cout << "new map center: " << T_wl.translation().transpose() << endl;
-            for(auto& i: map)
+            //cout << "new map center: " << T_wl.translation().transpose() << endl;
+            for(auto& i: *map)
             {
                 i.is_occupied=false;
             }
@@ -275,8 +287,8 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
                     if(xyz2xyzIdxwithBoderCheck(cell.pt_w,xyz_idx))
                     {
                         size_t map_idx=mapIdx(xyz_idx);
-                        map.at(map_idx).log_odds=cell.log_odds;
-                        map.at(mapIdx(xyz_idx)).is_occupied = true;
+                        map->at(map_idx).log_odds=cell.log_odds;
+                        map->at(mapIdx(xyz_idx)).is_occupied = true;
                     }
                 }
             }
@@ -308,8 +320,8 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
                         if(xyz2xyzIdxwithBoderCheck(cell.pt_w,xyz_idx))
                         {
                             size_t map_idx=mapIdx(xyz_idx);
-                            map.at(map_idx).log_odds=cell.log_odds;
-                            map.at(mapIdx(xyz_idx)).is_occupied = true;
+                            map->at(map_idx).log_odds=cell.log_odds;
+                            map->at(mapIdx(xyz_idx)).is_occupied = true;
                         }
                     }
                 }
@@ -323,8 +335,8 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
                     if(xyz2xyzIdxwithBoderCheck(cell.pt_w,xyz_idx))
                     {
                         size_t map_idx=mapIdx(xyz_idx);
-                        map.at(map_idx).log_odds=cell.log_odds;
-                        map.at(mapIdx(xyz_idx)).is_occupied = true;
+                        map->at(map_idx).log_odds=cell.log_odds;
+                        map->at(mapIdx(xyz_idx)).is_occupied = true;
                     }
                 }
             }
@@ -369,14 +381,14 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
         if(xyz2xyzIdxwithBoderCheck(p_w,xyz_idx))
         {
             size_t map_idx=mapIdx(xyz_idx);
-            map.at(map_idx).log_odds+=log_odds_hit;
-            if(map.at(map_idx).log_odds > log_odds_max)
+            map->at(map_idx).log_odds+=log_odds_hit;
+            if(map->at(map_idx).log_odds > log_odds_max)
             {
-                map.at(map_idx).log_odds=log_odds_max;
+                map->at(map_idx).log_odds=log_odds_max;
             }
             //set observerable
-            if(map.at(map_idx).log_odds > log_odds_occupied_sh){
-                map.at(mapIdx(xyz_idx)).is_occupied = true;
+            if(map->at(map_idx).log_odds > log_odds_occupied_sh){
+                map->at(mapIdx(xyz_idx)).is_occupied = true;
             }
         }else
         {
@@ -388,14 +400,14 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
         if(xyz2xyzIdxwithBoderCheck(p_miss_w,xyz_idx))
         {
             size_t map_idx=mapIdx(xyz_idx);
-            map.at(map_idx).log_odds--;
-            if(map.at(map_idx).log_odds < log_odds_min)
+            map->at(map_idx).log_odds--;
+            if(map->at(map_idx).log_odds < log_odds_min)
             {
-                map.at(map_idx).log_odds=log_odds_min;
+                map->at(map_idx).log_odds=log_odds_min;
             }
             //set free
-            if(map.at(map_idx).log_odds < log_odds_occupied_sh){
-                map.at(mapIdx(xyz_idx)).is_occupied = false;
+            if(map->at(map_idx).log_odds < log_odds_occupied_sh){
+                map->at(mapIdx(xyz_idx)).is_occupied = false;
             }
         }else
         {
@@ -403,7 +415,7 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
     }
     //Update occupied list;
     occupied_cell_idx.clear();
-    for(auto cell:map)
+    for(auto cell: *map)
     {
         if(cell.is_occupied)
         {

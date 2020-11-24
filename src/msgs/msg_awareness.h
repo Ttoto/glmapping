@@ -11,7 +11,7 @@
 class msg_awareness
 {
 public:
-    ros::Publisher localmap_pub;
+    ros::Publisher awarenessmap_pub;
 
     msg_awareness();
     msg_awareness(ros::NodeHandle& nh,

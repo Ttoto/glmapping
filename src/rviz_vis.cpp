@@ -138,7 +138,7 @@ void rviz_vis::pub_local_map(local_map_cartesian* localmap, const ros::Time stam
     //cout << "localmap occupied_cell_idx size " << localmap->occupied_cell_idx.size() << endl;
     for (auto i:localmap->occupied_cell_idx) {
         geometry_msgs::Point point;
-        Vec3 pt = localmap->map.at(i).center_pt;
+        Vec3 pt = localmap->map->at(i).center_pt;
         point.x = pt(0);
         point.y = pt(1);
         point.z = pt(2);
@@ -237,7 +237,7 @@ void rviz_vis::pub_global_local_map(map_warehouse* warehouse,
     Vec3 center_offset = localmap->map_center_xyz;
     for (auto i:localmap->occupied_cell_idx) {
         geometry_msgs::Point point;
-        Vec3 pt = localmap->map.at(i).center_pt;
+        Vec3 pt = localmap->map->at(i).center_pt;
         pt += center_offset;
         pc->points.push_back (PointP(pt.x(),pt.y(),pt.z()));
     }

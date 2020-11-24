@@ -47,7 +47,14 @@ awareness_frame_id: "awareness_frame"
 local_frame_id:     "local_frame"
 world_frame_id:     "map"
 
+#generate projected 2D map
+use_projected_2d_map: true
 
+#generate esdfs
+use_esdfs: true
+
+#visulization
+visulize_raycasting: false
 
 
 

@@ -14,9 +14,9 @@ public:
 
     msg_awareness2local();
     msg_awareness2local(ros::NodeHandle& nh, string topic_name, int buffersize=2);
-    void pub(const SE3 T_w_l, vector<Vec3> obs_pts, vector<Vec3> miss_pts, ros::Time stamp=ros::Time::now());
+    void pub(const SE3 T_w_a, vector<Vec3> obs_pts, vector<Vec3> miss_pts, ros::Time stamp=ros::Time::now());
     static void unpack(mlmapping::awareness2localConstPtr ptr,
-                       SE3             &T_w_l,
+                       SE3             &T_w_a,
                        vector<Vec3>    &l2g_obs_l,
                        vector<Vec3>    &l2g_miss_l,
                        ros::Time       &T);

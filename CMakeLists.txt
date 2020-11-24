@@ -65,6 +65,7 @@ add_library(mlmapping
     src/rviz_vis.cpp
     src/msgs/msg_awareness2local.cpp
     src/msgs/msg_awareness.cpp
+    src/msgs/msg_localmap.cpp
 #    src/global2occupancygrid2d.cpp
 #    src/global2esdf.cpp
 #    src/global2esdf3d.cpp
@@ -89,8 +90,9 @@ add_executable(visualization
     src/map_awareness.cpp
     src/map_warehouse.cpp
     src/map_local.cpp
-    src/msgs/msg_awareness.cpp
     src/rviz_vis.cpp
+    src/msgs/msg_awareness.cpp
+    src/msgs/msg_localmap.cpp
     )
 add_dependencies(visualization
     mlmapping_generate_messages_cpp

@@ -8,13 +8,13 @@
 mlmapping_am_d_Rho:         0.1
 mlmapping_am_d_Phi_deg:       2
 mlmapping_am_d_Z:           0.1
-mlmapping_am_n_Rho:          30
+mlmapping_am_n_Rho:          50
 mlmapping_am_n_Z_below:      20
 mlmapping_am_n_Z_over:        5
 
 #Lolbalmap papameter
 #n_xy/n_z available value     3x(2n+1)  3x(odd number)  E.g 27 39 45 75 81 135 165 195 243 495...
-mlmapping_lm_d_xyz:           0.1
+mlmapping_lm_d_xyz:           0.15
 mlmapping_lm_n_xy:            135
 mlmapping_lm_n_z:             75
 mlmapping_lm_log_odds_min:      -2.0
@@ -47,6 +47,15 @@ awareness_frame_id: "awareness_frame"
 local_frame_id:     "local_frame"
 world_frame_id:     "map"
 
+
+#generate projected 2D map
+use_projected_2d_map: true
+
+#generate esdfs
+use_esdfs: true
+
+#visulization
+visulize_raycasting: false
 
 
 

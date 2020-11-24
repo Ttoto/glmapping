@@ -67,7 +67,7 @@ void awareness_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double 
             }
         }
     }
-    cout << map->size() << endl;
+    cout << "awareness map contain " << map->size() << " cells"<< endl;
     first_input = true;
     visibility_check = apply_raycasting;
 }
@@ -111,9 +111,9 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
 
     //STEP 1: transfer from previous map
     //Frame [w]orld, [s]ensor, [b]ody, [l]ocalmap; [g]lobalmap
-    T_wl = SE3(SO3(Quaterniond(1,0,0,0)),T_wb.translation());
+    T_wa = SE3(SO3(Quaterniond(1,0,0,0)),T_wb.translation());
     SE3 T_ws = T_wb * this->T_bs;
-    SE3 T_ls = T_wl.inverse() * T_ws;
+    SE3 T_ls = T_wa.inverse() * T_ws;
     if(first_input)
     {
         first_input = false;
@@ -125,7 +125,7 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
         {
             cell.is_occupied = false;
         }
-        Vec3 t_diff = -(T_wl.translation()-this->last_T_wl.translation());
+        Vec3 t_diff = -(T_wa.translation()-this->last_T_wa.translation());
         for(auto& cell:*this->map_tmp)
         {
             if(cell.is_occupied)
@@ -164,7 +164,7 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
             if(visibility_check)
             {
                 double raycasting_rate = map->at(map_idx).raycasting_z_over_rho;
-                for (int r=rpz_idx[0]-2; r>0 ; r--)
+                for (int r=rpz_idx[0]-4; r>0 ; r--)
                 {
                     int diff_r = rpz_idx[0]-r;
                     int raycasting_z = static_cast<int>(round(rpz_idx[2]-(diff_r*raycasting_rate)));
@@ -174,5 +174,5 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
             }
         }
     }
-    this->last_T_wl = T_wl;
+    this->last_T_wa = T_wa;
 }

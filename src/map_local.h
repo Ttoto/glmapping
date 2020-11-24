@@ -67,7 +67,7 @@ public:
     SE3 T_wl; //Transformation from local to world
     Vec3   map_center_xyz;
     vector<unsigned int> occupied_cell_idx;
-    vector<CARTESIAN_CELL> map;
+    std::unique_ptr<vector<CARTESIAN_CELL>> map;
     LOCALMAP_VIS_PARA vis_paras;
     local_map_cartesian();
 
@@ -79,6 +79,7 @@ public:
                   float log_odds_hit_in,
                   float log_odds_miss_in,
                   float log_odds_occupied_sh_in);
+    void clear_map();
     void allocate_memory_for_local_map();
     void devide_local_map_to_submaps();
     bool get_the_relevant_submap_for_new_localmap(vector<unsigned int>& relevant_and_occupied_idx,
