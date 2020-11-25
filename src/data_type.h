@@ -16,6 +16,10 @@ struct CYLINDRICAL_CELL{
 
 typedef struct CARTESIAN_CELL{
     unsigned int idx;
+    unsigned int idx_x;
+    unsigned int idx_y;
+    unsigned int idx_z;
+    unsigned int project2d_idx;
     unsigned int relevant_submap_idx;
     Vec3  center_pt;//in local frame center
     bool  is_occupied;

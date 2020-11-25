@@ -28,9 +28,9 @@
         <remap from="/mlmapping/pose"        to="/imu_pose"/>
     </node>
 
-    <node pkg="nodelet" type="nodelet" args="load mlmapping/LocalMapNodeletClass mlmapping_nodelet_manager"
+<!--    <node pkg="nodelet" type="nodelet" args="load mlmapping/LocalMapNodeletClass mlmapping_nodelet_manager"
         name="localmap_loader" output="screen">
-    </node>
+    </node>-->
 
 </launch>
 

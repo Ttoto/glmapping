@@ -44,14 +44,8 @@ private:
     float log_odds_occupied_sh;
     bool  first_pose;
 
-    double map_dxyz;
-    Vec3   map_min_xyz;
     double map_min_x;
     double map_min_y;
-    double map_min_z;
-
-    unsigned int map_nxy;
-    unsigned int map_nz;
 
     SUBMAP_IN_LOCAL_PARA        submap_paras;
     SUBMAP_SWITCHING_CHECK_LIST sub_map_switching_check_list[27];//cloest 27 submaps
@@ -63,8 +57,13 @@ private:
     size_t mapIdx(unsigned int x_idx, unsigned int y_idx, unsigned int z_idx);
 
 public:
-
+    SE3 T_wa_latest;
     SE3 T_wl; //Transformation from local to world
+    double map_min_z;
+    Vec3   map_min_xyz;
+    unsigned int map_nxy;
+    unsigned int map_nz;
+    double map_dxyz;
     Vec3   map_center_xyz;
     vector<unsigned int> occupied_cell_idx;
     std::unique_ptr<vector<CARTESIAN_CELL>> map;
@@ -86,7 +85,7 @@ public:
                                                   vector<unsigned int>& unrelevant_and_occupied_idx);
     void input_pc_pose(vector<Vec3> PC_hit_a,
                        vector<Vec3> PC_miss_a,
-                       SE3 T_wa,
+                       SE3 T_wa_in,
                        map_warehouse* warehouse);
 };
 

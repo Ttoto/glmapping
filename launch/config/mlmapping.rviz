@@ -6,9 +6,11 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /Grid1/Status1
         - /TF1/Frames1
         - /MLMapping1
-        - /MLMapping1/Global Map1
+        - /Map1/Status1
+        - /Axes1
       Splitter Ratio: 0.5441176295280457
     Tree Height: 728
   - Class: rviz/Selection
@@ -61,11 +63,11 @@ Visualization Manager:
       Frames:
         All Enabled: false
         awareness_frame:
-          Value: true
+          Value: false
         body_frame:
           Value: true
         camera1_depth_optical_frame:
-          Value: true
+          Value: false
         local_frame:
           Value: true
         map:
@@ -99,8 +101,8 @@ Visualization Manager:
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 5.300000190734863
-            Min Value: -2.5
+            Max Value: 5.099999904632568
+            Min Value: -2.200000047683716
             Value: true
           Axis: Z
           Channel Name: intensity
@@ -135,13 +137,13 @@ Visualization Manager:
           Queue Size: 100
           Value: false
         - Class: rviz/Marker
-          Enabled: true
+          Enabled: false
           Marker Topic: /localmap_loader/raycasting
           Name: RayCasting
           Namespaces:
             {}
           Queue Size: 100
-          Value: true
+          Value: false
       Enabled: true
       Name: MLMapping
     - Alpha: 1
@@ -174,9 +176,26 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 0.699999988079071
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /occupancy_map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 30
+      Name: Axes
+      Radius: 0.10000000149011612
+      Reference Frame: <Fixed Frame>
+      Value: true
   Enabled: true
   Global Options:
-    Background Color: 238; 238; 236
+    Background Color: 85; 87; 83
     Default Light: true
     Fixed Frame: map
     Frame Rate: 30
@@ -202,25 +221,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 17.696962356567383
+      Distance: 56.617210388183594
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -3.1539459228515625
-        Y: 0.3734859228134155
-        Z: 0.010698024183511734
+        X: -1.5989868640899658
+        Y: -1.1756923198699951
+        Z: 0.010697043500840664
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.9197959303855896
-      Target Frame: awareness_frame
+      Pitch: 0.8147962689399719
+      Target Frame: body_frame
       Value: ThirdPersonFollower (rviz)
-      Yaw: 3.3125507831573486
+      Yaw: 1.0471019744873047
     Saved: ~
 Window Geometry:
   Displays:

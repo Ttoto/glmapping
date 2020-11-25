@@ -79,6 +79,11 @@ private:
             transformStamped_T_wa.transform.translation = transformStamped_T_wb.transform.translation;
             br.sendTransform(transformStamped_T_wa);
         }
+        if(publish_T_bs)
+        {
+            transformStamped_T_bs.header.stamp = pose_Ptr->header.stamp;
+            br.sendTransform(transformStamped_T_bs);
+        }
 
         PointCloudP_ptr cloud (new PointCloudP);
         pcl::fromROSMsg (*pc_Ptr, *cloud);

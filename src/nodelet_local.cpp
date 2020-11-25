@@ -30,6 +30,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <independent_modules/l2grid2d.h>
 
 //#include <global2occupancygrid2d.h>
 //#include <global2esdf.h>
@@ -54,8 +55,9 @@ private:
     tf2_ros::TransformBroadcaster br;
     geometry_msgs::TransformStamped transformStamped_T_wl;
     bool visulize_raycasting;
-
-    //    Global2OccupancyGrid2D *occupancy_grid_publisher;
+    bool enable_project2d;
+    Local2OccupancyGrid2D *occupancy_grid_publisher;
+    //    Global2OccupancyGrid2D
     //    Global2ESDF *esfd2d_publisher;
     //    Global2ESDF3DPatch *esfd3d_publisher;
     ros::Publisher map_pub;
@@ -75,6 +77,10 @@ private:
         transformStamped_T_wl.header.stamp = stamp;
         br.sendTransform(transformStamped_T_wl);
         localmap_pub->pub(local_map,stamp);
+        if(enable_project2d)
+        {
+            occupancy_grid_publisher->pub_occupancy_grid_2D_from_localmap(local_map,stamp);
+        }
         globalmap_publisher->pub_global_local_map(warehouse,local_map,stamp);
         //globalmap_publisher->pub_global_map(warehouse,stamp);
         //        occupancy_grid_publisher->pub_occupancy_grid_2D_from_globalmap(*local_map,stamp);
@@ -152,6 +158,16 @@ private:
         transformStamped_T_wl.transform.rotation.w = 1;
 
         visulize_raycasting = getBoolVariableFromYaml(configFilePath,"visulize_raycasting");
+
+        //independ modules:
+        enable_project2d = getBoolVariableFromYaml(configFilePath,"use_projected_2d_map");
+        occupancy_grid_publisher = new Local2OccupancyGrid2D(nh,"/occupancy_map",2);
+
+        occupancy_grid_publisher->setLocalMap(local_map,
+                                              getStringFromYaml(configFilePath,"local_frame_id"),
+                                              getBoolVariableFromYaml(configFilePath,"use_relative_height"),
+                                              getDoubleVariableFromYaml(configFilePath,"projected_2d_map_max_z"),
+                                              getDoubleVariableFromYaml(configFilePath,"projected_2d_map_min_z"));
 
         //timer
         timer_ = nh.createTimer(ros::Duration(0.2), boost::bind(&LocalMapNodeletClass::timerCb, this, _1));

@@ -13,9 +13,9 @@ mlmapping_am_n_Z_below:      20
 mlmapping_am_n_Z_over:       5
 
 #Lolbalmap papameter
-#n_xy/n_z available value     3x(2n+1)  3x(odd number)  E.g 27 39 45 75 81 135 165 195 243 495...
+#n_xy/n_z available value     5x(2n+1)  5x(odd number)  E.g 27 39 45 75 81 135 165 195 495...
 mlmapping_lm_d_xyz:           0.1
-mlmapping_lm_n_xy:            195
+mlmapping_lm_n_xy:            225
 mlmapping_lm_n_z:             45
 mlmapping_lm_log_odds_min:      -2.0
 mlmapping_lm_log_odds_max:       4.0
@@ -49,7 +49,10 @@ world_frame_id:     "map"
 
 
 #generate projected 2D map
-use_projected_2d_map: true
+use_projected_2d_map:   true
+use_relative_height:    true
+projected_2d_map_min_z: -0.3
+projected_2d_map_max_z:  0.3
 
 #generate esdfs
 use_esdfs: true

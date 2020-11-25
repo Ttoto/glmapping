@@ -182,13 +182,13 @@ void rviz_vis::pub_local_map(local_map_cartesian* localmap, const ros::Time stam
     range2.id = 1;
     range2.scale.x = range2.scale.y = localmap->vis_paras.map_size_xy*0.2;
     range2.scale.z = localmap->vis_paras.map_size_z*0.2;
-    range2.color.a = 0.3;
+    range2.color.a = 0.2;
     this->map_pub.publish(range2);
     range3.id = 2;
-    range3.scale.x = range3.scale.y = localmap->vis_paras.map_size_xy*0.6;
-    range3.scale.z = localmap->vis_paras.map_size_z*0.6;
-    range3.color.a = 0.2;
-    this->map_pub.publish(range3);
+//    range3.scale.x = range3.scale.y = localmap->vis_paras.map_size_xy*0.6;
+//    range3.scale.z = localmap->vis_paras.map_size_z*0.6;
+//    range3.color.a = 0.2;
+//    this->map_pub.publish(range3);
 
 }
 

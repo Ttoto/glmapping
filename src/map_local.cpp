@@ -159,9 +159,10 @@ void local_map_cartesian::allocate_memory_for_local_map()
                 CARTESIAN_CELL cell;
                 cell.is_occupied = false;
                 cell.sd = 0;
-                //                cell.idx_x = x;
-                //                cell.idx_y = y;
-                //                cell.idx_z = z;
+                cell.idx_x = x;
+                cell.idx_y = y;
+                cell.idx_z = z;
+                cell.project2d_idx = x+y*map_nxy;
                 cell.log_odds = 0;
                 cell.idx = idx_in_order;
                 cell.center_pt = Vec3(minxy + (map_dxyz/2) + (x*map_dxyz),
@@ -205,6 +206,7 @@ void local_map_cartesian::input_pc_pose(vector<Vec3> PC_hit_a,
                                         SE3 T_wa,
                                         map_warehouse* warehouse)
 {
+    T_wa_latest = T_wa;
     if(first_pose)
     {
         //center_xyz and min_xyz

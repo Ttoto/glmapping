@@ -66,6 +66,7 @@ add_library(mlmapping
     src/msgs/msg_awareness2local.cpp
     src/msgs/msg_awareness.cpp
     src/msgs/msg_localmap.cpp
+    src/independent_modules/l2grid2d.cpp
 #    src/global2occupancygrid2d.cpp
 #    src/global2esdf.cpp
 #    src/global2esdf3d.cpp
