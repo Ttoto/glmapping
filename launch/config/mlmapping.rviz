@@ -6,12 +6,12 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Grid1/Status1
+        - /TF1
         - /TF1/Frames1
         - /MLMapping1
-        - /Map1/Status1
-        - /Axes1
-      Splitter Ratio: 0.5441176295280457
+        - /PointCloud21
+        - /PointCloud21/Status1
+      Splitter Ratio: 0.5386221408843994
     Tree Height: 728
   - Class: rviz/Selection
     Name: Selection
@@ -61,18 +61,18 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: false
+        All Enabled: true
         awareness_frame:
-          Value: false
+          Value: true
         body_frame:
           Value: true
-        camera1_depth_optical_frame:
-          Value: false
+        camera_depth_optical_frame:
+          Value: true
         local_frame:
           Value: true
         map:
           Value: true
-      Marker Scale: 2
+      Marker Scale: 10
       Name: TF
       Show Arrows: true
       Show Axes: true
@@ -82,7 +82,7 @@ Visualization Manager:
           awareness_frame:
             {}
           body_frame:
-            camera1_depth_optical_frame:
+            camera_depth_optical_frame:
               {}
           local_frame:
             {}
@@ -90,6 +90,14 @@ Visualization Manager:
       Value: true
     - Class: rviz/Group
       Displays:
+        - Class: rviz/Marker
+          Enabled: false
+          Marker Topic: /awareness_map
+          Name: Awareness Map
+          Namespaces:
+            {}
+          Queue Size: 100
+          Value: false
         - Class: rviz/Marker
           Enabled: false
           Marker Topic: /local_map
@@ -101,8 +109,8 @@ Visualization Manager:
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 5.099999904632568
-            Min Value: -2.200000047683716
+            Max Value: 0.800000011920929
+            Min Value: -1.2000000476837158
             Value: true
           Axis: Z
           Channel Name: intensity
@@ -121,21 +129,31 @@ Visualization Manager:
           Queue Size: 10
           Selectable: true
           Size (Pixels): 3
-          Size (m): 0.10000000149011612
+          Size (m): 0.15000000596046448
           Style: Flat Squares
           Topic: /global_map
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
           Value: true
-        - Class: rviz/Marker
+        - Alpha: 0.699999988079071
+          Class: rviz/Map
+          Color Scheme: map
+          Draw Behind: false
           Enabled: false
-          Marker Topic: /awareness_map
-          Name: Awareness Map
+          Name: Map
+          Topic: /occupancy_map
+          Unreliable: false
+          Use Timestamp: false
+          Value: false
+        - Class: rviz/Marker
+          Enabled: true
+          Marker Topic: /esdfs
+          Name: ESDFs
           Namespaces:
             {}
           Queue Size: 100
-          Value: false
+          Value: true
         - Class: rviz/Marker
           Enabled: false
           Marker Topic: /localmap_loader/raycasting
@@ -158,6 +176,43 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Input
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /camera1/depth/color/points
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 30
+      Name: Axes
+      Radius: 0.10000000149011612
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Alpha: 0.5
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: RGB8
+      Decay Time: 0
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
@@ -169,29 +224,12 @@ Visualization Manager:
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.009999999776482582
+      Size (m): 0.05000000074505806
       Style: Flat Squares
-      Topic: /camera1/depth/color/points
+      Topic: /esdfs_aaa
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
-    - Alpha: 0.699999988079071
-      Class: rviz/Map
-      Color Scheme: map
-      Draw Behind: false
-      Enabled: true
-      Name: Map
-      Topic: /occupancy_map
-      Unreliable: false
-      Use Timestamp: false
-      Value: true
-    - Class: rviz/Axes
-      Enabled: true
-      Length: 30
-      Name: Axes
-      Radius: 0.10000000149011612
-      Reference Frame: <Fixed Frame>
       Value: true
   Enabled: true
   Global Options:
@@ -221,7 +259,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 56.617210388183594
+      Distance: 25.19928741455078
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -236,10 +274,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8147962689399719
+      Pitch: 0.3097950518131256
       Target Frame: body_frame
       Value: ThirdPersonFollower (rviz)
-      Yaw: 1.0471019744873047
+      Yaw: 0.40343716740608215
     Saved: ~
 Window Geometry:
   Displays:

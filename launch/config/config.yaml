@@ -48,13 +48,20 @@ local_frame_id:     "local_frame"
 world_frame_id:     "map"
 
 #generate projected 2D map
-use_projected_2d_map: true
+use_projected_2d_map:   true
+use_relative_height:    true
+projected_2d_map_min_z: -0.3
+projected_2d_map_max_z:  0.3
 
 #generate esdfs
 use_esdfs: true
+esdfs_n_xy:              35
+esdfs_n_z:               13
+batch_max_search_range:  10
 
 #visulization
 visulize_raycasting: false
+
 
 
 

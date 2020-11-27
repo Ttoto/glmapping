@@ -67,9 +67,7 @@ add_library(mlmapping
     src/msgs/msg_awareness.cpp
     src/msgs/msg_localmap.cpp
     src/independent_modules/l2grid2d.cpp
-#    src/global2occupancygrid2d.cpp
-#    src/global2esdf.cpp
-#    src/global2esdf3d.cpp
+    src/independent_modules/l2esdfs_batch_3d.cpp
     )
 
 add_dependencies(mlmapping
@@ -82,7 +80,6 @@ target_link_libraries(mlmapping
     ${CSPARSE_LIBRARY}
     ${Sophus_LIBRARIES}
     ${YAML_CPP_LIBRARIES}
-    ${PCL_LIBRARIES}
     ${Boost_SYSTEM_LIBRARY}
     )
 

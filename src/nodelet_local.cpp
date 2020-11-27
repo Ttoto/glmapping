@@ -31,6 +31,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <independent_modules/l2grid2d.h>
+#include <independent_modules/l2esdfs_batch_3d.h>
 
 //#include <global2occupancygrid2d.h>
 //#include <global2esdf.h>
@@ -56,10 +57,10 @@ private:
     geometry_msgs::TransformStamped transformStamped_T_wl;
     bool visulize_raycasting;
     bool enable_project2d;
+    bool enable_esfds;
     Local2OccupancyGrid2D *occupancy_grid_publisher;
-    //    Global2OccupancyGrid2D
-    //    Global2ESDF *esfd2d_publisher;
-    //    Global2ESDF3DPatch *esfd3d_publisher;
+    Local2ESDFsBatch      *esdfs_publisher;
+
     ros::Publisher map_pub;
 
     void from_awareness_callback(const mlmapping::awareness2localConstPtr & msg)
@@ -80,6 +81,10 @@ private:
         if(enable_project2d)
         {
             occupancy_grid_publisher->pub_occupancy_grid_2D_from_localmap(local_map,stamp);
+        }
+        if(enable_esfds)
+        {
+            esdfs_publisher->pub_ESDF_3D_from_localmap(local_map,stamp);
         }
         globalmap_publisher->pub_global_local_map(warehouse,local_map,stamp);
         //globalmap_publisher->pub_global_map(warehouse,stamp);
@@ -164,10 +169,17 @@ private:
         occupancy_grid_publisher = new Local2OccupancyGrid2D(nh,"/occupancy_map",2);
 
         occupancy_grid_publisher->setLocalMap(local_map,
-                                              getStringFromYaml(configFilePath,"local_frame_id"),
+                                              getStringFromYaml(configFilePath,"world_frame_id"),
                                               getBoolVariableFromYaml(configFilePath,"use_relative_height"),
                                               getDoubleVariableFromYaml(configFilePath,"projected_2d_map_max_z"),
                                               getDoubleVariableFromYaml(configFilePath,"projected_2d_map_min_z"));
+        enable_esfds = getBoolVariableFromYaml(configFilePath,"use_esdfs");
+        esdfs_publisher = new Local2ESDFsBatch(nh,"/esdfs_aaa",2);
+        esdfs_publisher->setLocalMap(local_map,
+                                     getStringFromYaml(configFilePath,"awareness_frame_id"),
+                                     getIntVariableFromYaml(configFilePath,"esdfs_n_xy"),
+                                     getIntVariableFromYaml(configFilePath,"esdfs_n_z"),
+                                     getIntVariableFromYaml(configFilePath,"batch_max_search_range"));
 
         //timer
         timer_ = nh.createTimer(ros::Duration(0.2), boost::bind(&LocalMapNodeletClass::timerCb, this, _1));
@@ -178,7 +190,7 @@ private:
         globalmap_publisher->set_as_global_map_publisher(nh,"/global_map",
                                                          getStringFromYaml(configFilePath,"world_frame_id"),
                                                          5);
-        map_pub = nh.advertise<visualization_msgs::Marker>("raycasting", 3);
+        map_pub = nh.advertise<visualization_msgs::Marker>("/raycasting", 3);
         //subscriber
         sub_from_local = nh.subscribe<mlmapping::awareness2local>(
                     "/awareness2local",

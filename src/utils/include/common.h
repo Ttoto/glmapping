@@ -9,6 +9,7 @@
 #include <eigen3/Eigen/Geometry>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <pcl/impl/point_types.hpp>
 #include "../3rdPartLib/Sophus/sophus/so3.h"
 #include "../3rdPartLib/Sophus/sophus/se3.h"
 
@@ -46,16 +47,19 @@ typedef Eigen::Matrix<double, 15, 1> Mat15x1;
 
 
 
-typedef pcl::PointXYZ    PointP;
-typedef pcl::PointXYZRGB PointRGB;
-typedef pcl::PointXYZI   PointI;
+typedef pcl::PointXYZ     PointP;
+typedef pcl::PointXYZRGB  PointRGB;
+typedef pcl::PointXYZRGBA PointRGBA;
+typedef pcl::PointXYZI    PointI;
 
-typedef pcl::PointCloud<PointP>   PointCloudP;
-typedef pcl::PointCloud<PointRGB> PointCloudRGB;
-typedef pcl::PointCloud<PointI>   PointCloudI;
+typedef pcl::PointCloud<PointP>    PointCloudP;
+typedef pcl::PointCloud<PointRGB>  PointCloudRGB;
+typedef pcl::PointCloud<PointRGBA> PointCloudRGBA;
+typedef pcl::PointCloud<PointI>    PointCloudI;
 
-typedef PointCloudP::Ptr   PointCloudP_ptr;
-typedef PointCloudRGB::Ptr PointCloudRGB_ptr;
-typedef PointCloudI::Ptr   PointCloudI_ptr;
+typedef PointCloudP::Ptr    PointCloudP_ptr;
+typedef PointCloudRGB::Ptr  PointCloudRGB_ptr;
+typedef PointCloudRGBA::Ptr PointCloudRGBA_ptr;
+typedef PointCloudI::Ptr    PointCloudI_ptr;
 
 #endif // COMMON_H

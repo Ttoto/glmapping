@@ -51,11 +51,6 @@ private:
     SUBMAP_SWITCHING_CHECK_LIST sub_map_switching_check_list[27];//cloest 27 submaps
     SUBMAP                      sub_maps[125];
 
-    Vec3I xyz2xyzIdx(Vec3 xyz_w);
-    bool  xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx);
-    size_t mapIdx(Vec3I xyz_idx);
-    size_t mapIdx(unsigned int x_idx, unsigned int y_idx, unsigned int z_idx);
-
 public:
     SE3 T_wa_latest;
     SE3 T_wl; //Transformation from local to world
@@ -68,8 +63,8 @@ public:
     vector<unsigned int> occupied_cell_idx;
     std::unique_ptr<vector<CARTESIAN_CELL>> map;
     LOCALMAP_VIS_PARA vis_paras;
-    local_map_cartesian();
 
+    local_map_cartesian();
     void init_map(double d_xyz_in,
                   unsigned int n_xy_in,
                   unsigned n_z_in,
@@ -87,6 +82,10 @@ public:
                        vector<Vec3> PC_miss_a,
                        SE3 T_wa_in,
                        map_warehouse* warehouse);
+    Vec3I xyz2xyzIdx(Vec3 xyz_w);
+    bool  xyz2xyzIdxwithBoderCheck(Vec3 xyz_w, Vec3I &xyz_idx);
+    size_t mapIdx(Vec3I xyz_idx);
+    size_t mapIdx(unsigned int x_idx, unsigned int y_idx, unsigned int z_idx);
 };
 
 #endif // local_map_cartesian_H

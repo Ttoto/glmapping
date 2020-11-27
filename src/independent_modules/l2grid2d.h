@@ -26,7 +26,7 @@ public:
     
     Local2OccupancyGrid2D(ros::NodeHandle& nh, string topic_name, unsigned int buffersize=2);
     void setLocalMap(local_map_cartesian* map,
-                     string local_fram_id,
+                     string world_frame_id,
                      bool relative_height_in,
                      double max_z_in,
                      double min_z_in);
